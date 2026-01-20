@@ -5,6 +5,9 @@
   Time: 15:37
   To change this template use File | Settings | File Templates.
 --%>
+
+<%@ page contentType="text/html;charset=UTF-8" isELIgnored="false" %>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page isELIgnored="false" %>
 <!doctype html>
@@ -53,10 +56,17 @@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h2>Dashboard</h2>
             </div>
+
+            <!-- ✅ 访客计数器（加在这里） -->
+            <p class="text-muted">
+                Visitor count: <strong>${count}</strong>
+            </p>
+
             <div class="table-responsive">
                 Welcome to use Precision Medicine Matching System
             </div>
         </main>
+
     </div>
 </div>
 </body>
