@@ -13,6 +13,11 @@ public class AuthenticationFilter implements Filter {
     public static final String USERNAME = "username";
 
     @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // 如果不需要初始化可以留空
+    }
+
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpSession session = httpServletRequest.getSession();
@@ -29,5 +34,9 @@ public class AuthenticationFilter implements Filter {
             response.setContentType("text/html");
             response.getWriter().write("You are not allowed to view dosing guideline, please <a href='signin'>sign in</a> first.");
         }
+    }
+    @Override
+    public void destroy() {
+        // 必须有！不需要做事也要写空方法
     }
 }
