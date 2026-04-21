@@ -1,0 +1,9 @@
+##fileformat=VCFv4.2
+##source=ExampleAnnotatedVCF
+##INFO=<ID=Gene.refGene,Number=1,Type=String,Description="Gene name from refGene">
+##INFO=<ID=Func.refGene,Number=1,Type=String,Description="Functional annotation from refGene">
+##INFO=<ID=ExonicFunc.refGene,Number=1,Type=String,Description="Exonic functional annotation from refGene">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+7	140453136	.	A	T	.	PASS	Gene.refGene=EGFR;Func.refGene=exonic;ExonicFunc.refGene=nonsynonymous SNV
+17	7674220	.	G	A	.	PASS	Gene.refGene=TP53;Func.refGene=exonic;ExonicFunc.refGene=nonsynonymous SNV
+12	25398284	.	C	T	.	PASS	Gene.refGene=KRAS;Func.refGene=exonic;ExonicFunc.refGene=nonsynonymous SNV

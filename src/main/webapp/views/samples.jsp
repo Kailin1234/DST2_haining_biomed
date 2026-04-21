@@ -14,17 +14,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <meta name="generator" content="">
-    <title>Dashboard Template · Bootstrap</title>
+    <title>Sample Records</title>
 
-    <!-- Bootstrap core CSS -->
     <link href="<%=request.getContextPath()%>/static/bootstrap/css/bootstrap.css" rel="stylesheet">
     <script src="<%=request.getContextPath()%>/static/jquery/jquery-3.4.1.js"></script>
     <script src="<%=request.getContextPath()%>/static/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom styles for this template -->
     <link href="<%=request.getContextPath()%>/static/css/app.css" rel="stylesheet">
+
     <style>
         .bd-placeholder-img {
             font-size: 1.125rem;
@@ -45,42 +41,59 @@
 <body>
 <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
     <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Precision Medicine Matching System</a>
-
 </nav>
 
 <div class="container-fluid">
     <div class="row">
-        <jsp:include page="nav.jsp" >
+        <jsp:include page="nav.jsp">
             <jsp:param name="active" value="samples" />
         </jsp:include>
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h2>Samples</h2>
+                <h2>Sample Records</h2>
+                <div>
+                    <a href="<%=request.getContextPath()%>/matchingIndex" class="btn btn-primary btn-sm">Upload New File</a>
+                </div>
             </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-sm">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Uploaded By</th>
-                        <th>Uploaded At</th>
-                        <th>Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <c:forEach items="${samples}" var="item" varStatus="loop">
-                        <tr>
-                            <td>${item.id}</td>
-                            <td>${item.uploadedBy}</td>
-                            <td>${item.createdAt}</td>
-                            <td><a href="matching?sampleId=${item.id}">matching</a></td>
-                        </tr>
-                    </c:forEach>
 
-                    </tbody>
-                </table>
-            </div>
+            <c:choose>
+                <c:when test="${samples != null && !samples.isEmpty()}">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-sm">
+                            <thead class="thead-light">
+                            <tr>
+                                <th style="width: 80px;">Sample ID</th>
+                                <th style="width: 180px;">Uploaded By</th>
+                                <th style="width: 220px;">Uploaded At</th>
+                                <th style="width: 120px;">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <c:forEach items="${samples}" var="item">
+                                <tr>
+                                    <td>${item.id}</td>
+                                    <td><c:out value="${item.uploadedBy}" /></td>
+                                    <td>${item.createdAt}</td>
+                                    <td>
+                                        <a href="<%=request.getContextPath()%>/matching?sampleId=${item.id}" class="btn btn-outline-primary btn-sm">
+                                            View Result
+                                        </a>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
+                </c:when>
+
+                <c:otherwise>
+                    <div class="alert alert-info" role="alert">
+                        No sample records are available yet.
+                    </div>
+                    <a href="<%=request.getContextPath()%>/matchingIndex" class="btn btn-primary">Upload Your First File</a>
+                </c:otherwise>
+            </c:choose>
         </main>
     </div>
 </div>
