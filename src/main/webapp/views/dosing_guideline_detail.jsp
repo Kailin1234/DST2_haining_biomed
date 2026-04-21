@@ -1,0 +1,173 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page isELIgnored="false" %>
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Dosing Guideline Detail</title>
+
+    <link href="<%=request.getContextPath()%>/static/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <script src="<%=request.getContextPath()%>/static/jquery/jquery-3.4.1.js"></script>
+    <script src="<%=request.getContextPath()%>/static/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <link href="<%=request.getContextPath()%>/static/css/app.css" rel="stylesheet">
+
+    <style>
+        .detail-card {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            background-color: #ffffff;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+
+        .guideline-id-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background-color: #e9ecef;
+            color: #495057;
+            font-size: 0.95rem;
+            margin-left: 10px;
+        }
+
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #343a40;
+        }
+
+        .info-row {
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .content-box {
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.6;
+            color: #343a40;
+        }
+
+        .flag-yes {
+            color: #155724;
+            font-weight: 600;
+        }
+
+        .flag-no {
+            color: #856404;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Precision Medicine Matching System</a>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <jsp:include page="nav.jsp">
+            <jsp:param name="active" value="dosing_guideline" />
+        </jsp:include>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            <div class="pt-3 pb-2 mb-3 border-bottom d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Dosing Guideline Detail</h2>
+                <a href="<%=request.getContextPath()%>/dosingGuideline" class="btn btn-secondary btn-sm">Back to Guideline List</a>
+            </div>
+
+            <c:if test="${dosingGuideline != null}">
+                <div class="detail-card">
+                    <h3 class="mb-3">
+                        <c:out value="${dosingGuideline.name}" />
+                        <span class="guideline-id-badge"><c:out value="${dosingGuideline.id}" /></span>
+                    </h3>
+
+                    <div class="info-row">
+                        <span class="info-label">Source:</span>
+                        <c:out value="${dosingGuideline.source}" />
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Drug ID:</span>
+                        <c:out value="${dosingGuideline.drugId}" />
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Recommendation:</span>
+                        <c:choose>
+                            <c:when test="${dosingGuideline.recommendation}">
+                                <span class="flag-yes">Yes</span>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="flag-no">No</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Condition type:</span>
+                        <c:choose>
+                            <c:when test="${dosingGuideline.conditionType != null && dosingGuideline.conditionType != ''}">
+                                <c:out value="${dosingGuideline.conditionType}" />
+                            </c:when>
+                            <c:otherwise>Not available</c:otherwise>
+                        </c:choose>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Condition value:</span>
+                        <c:choose>
+                            <c:when test="${dosingGuideline.conditionValue != null && dosingGuideline.conditionValue != ''}">
+                                <c:out value="${dosingGuideline.conditionValue}" />
+                            </c:when>
+                            <c:otherwise>Not available</c:otherwise>
+                        </c:choose>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Evidence level:</span>
+                        <c:choose>
+                            <c:when test="${dosingGuideline.evidenceLevel != null && dosingGuideline.evidenceLevel != ''}">
+                                <c:out value="${dosingGuideline.evidenceLevel}" />
+                            </c:when>
+                            <c:otherwise>Not available</c:otherwise>
+                        </c:choose>
+                    </div>
+
+                    <div class="section-title">Summary</div>
+                    <div class="content-box">
+                        <c:choose>
+                            <c:when test="${dosingGuideline.summaryMarkdown != null && dosingGuideline.summaryMarkdown != ''}">
+                                <c:out value="${dosingGuideline.summaryMarkdown}" />
+                            </c:when>
+                            <c:otherwise>No summary is currently available.</c:otherwise>
+                        </c:choose>
+                    </div>
+
+                    <div class="section-title">Full Guideline Text</div>
+                    <div class="content-box">
+                        <c:choose>
+                            <c:when test="${dosingGuideline.textMarkdown != null && dosingGuideline.textMarkdown != ''}">
+                                <c:out value="${dosingGuideline.textMarkdown}" />
+                            </c:when>
+                            <c:otherwise>No detailed text is currently available.</c:otherwise>
+                        </c:choose>
+                    </div>
+                </div>
+            </c:if>
+        </main>
+    </div>
+</div>
+</body>
+</html>
