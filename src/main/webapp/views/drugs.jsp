@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: hello
-  Date: 2019-12-3
-  Time: 15:37
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isELIgnored="false" %>
@@ -144,9 +137,12 @@
         }
     </style>
 </head>
+
 <body>
 <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Precision Medicine Matching System</a>
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="<%=request.getContextPath()%>/">
+        Precision Medicine Matching System
+    </a>
 </nav>
 
 <div class="container-fluid">
@@ -156,6 +152,7 @@
         </jsp:include>
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+
             <div class="pt-3 pb-2 mb-3 border-bottom">
                 <h2>Drug Knowledge</h2>
                 <div class="page-subtitle">
@@ -166,6 +163,7 @@
             <div class="card search-card mb-4">
                 <div class="card-body">
                     <form method="get" action="<%=request.getContextPath()%>/drugs" class="form-inline">
+
                         <div class="form-group mr-3 mb-2">
                             <label for="keyword" class="mr-2">Keyword</label>
                             <input type="text"
@@ -192,12 +190,16 @@
             </div>
 
             <c:choose>
-                <c:when test="${drugs != null && !drugs.isEmpty()}">
+                <c:when test="${not empty drugs}">
                     <div class="result-count">
                         Total drugs shown: ${drugs.size()}
                     </div>
 
                     <c:forEach items="${drugs}" var="item">
+                        <c:url var="drugDetailUrl" value="/drugDetail">
+                            <c:param name="id" value="${item.id}" />
+                        </c:url>
+
                         <div class="drug-card">
                             <div class="drug-header">
                                 <div class="drug-title">
@@ -243,7 +245,7 @@
 
                             <div class="drug-links">
                                 <span>
-                                    <a href="<%=request.getContextPath()%>/drugDetail?id=${item.id}" class="btn btn-outline-primary btn-sm">
+                                    <a href="${drugDetailUrl}" class="btn btn-outline-primary btn-sm">
                                         View Detail
                                     </a>
                                 </span>
@@ -293,6 +295,7 @@
                     </div>
                 </c:otherwise>
             </c:choose>
+
         </main>
     </div>
 </div>

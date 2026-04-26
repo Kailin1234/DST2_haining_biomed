@@ -15,10 +15,16 @@ public class IndexController {
 
     public void register(DispatchServlet.Dispatcher dispatcher) {
         dispatcher.registerGetMapping("/", this::index);
+        dispatcher.registerGetMapping("/help", this::help);
     }
 
-    public void index(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void index(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         request.getRequestDispatcher("/views/index.jsp").forward(request, response);
+    }
 
+    public void help(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.getRequestDispatcher("/views/help.jsp").forward(request, response);
     }
 }

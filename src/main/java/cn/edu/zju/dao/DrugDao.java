@@ -2,8 +2,6 @@ package cn.edu.zju.dao;
 
 import cn.edu.zju.bean.Drug;
 import cn.edu.zju.dbutils.DBUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,15 +11,15 @@ import java.util.List;
 
 public class DrugDao extends BaseDao {
 
-    private static final Logger log = LoggerFactory.getLogger(DrugDao.class);
-
     public boolean existsById(String id) {
         return super.existsById(id, "drug");
     }
 
     public void saveDrug(Drug drug) {
         DBUtils.execSQL(connection -> {
-            String sql = "INSERT INTO drug (id, name, obj_cls, biomarker, drug_url, description, biomarker_associated, pharmgkb_id, drugbank_id, pubchem_id, kegg_id) " +
+            String sql = "INSERT INTO drug " +
+                    "(id, name, obj_cls, biomarker, drug_url, description, biomarker_associated, " +
+                    "pharmgkb_id, drugbank_id, pubchem_id, kegg_id) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -31,11 +29,13 @@ public class DrugDao extends BaseDao {
                 preparedStatement.setBoolean(4, drug.isBiomarker());
                 preparedStatement.setString(5, drug.getDrugUrl());
                 preparedStatement.setString(6, drug.getDescription());
+
                 if (drug.getBiomarkerAssociated() == null) {
                     preparedStatement.setObject(7, null);
                 } else {
                     preparedStatement.setBoolean(7, drug.getBiomarkerAssociated());
                 }
+
                 preparedStatement.setString(8, drug.getPharmgkbId());
                 preparedStatement.setString(9, drug.getDrugbankId());
                 preparedStatement.setString(10, drug.getPubchemId());
@@ -64,28 +64,37 @@ public class DrugDao extends BaseDao {
 
             List<Object> params = new ArrayList<>();
 
-            if (keyword != null && !keyword.trim().isEmpty()) {
-                sql.append("AND (LOWER(name) LIKE ? OR LOWER(id) LIKE ? OR LOWER(obj_cls) LIKE ?) ");
+            if (hasText(keyword)) {
+                sql.append("AND (")
+                        .append("LOWER(id) LIKE ? ")
+                        .append("OR LOWER(name) LIKE ? ")
+                        .append("OR LOWER(obj_cls) LIKE ? ")
+                        .append("OR LOWER(description) LIKE ? ")
+                        .append("OR LOWER(pharmgkb_id) LIKE ? ")
+                        .append("OR LOWER(drugbank_id) LIKE ? ")
+                        .append("OR LOWER(pubchem_id) LIKE ? ")
+                        .append("OR LOWER(kegg_id) LIKE ? ")
+                        .append("OR LOWER(drug_url) LIKE ? ")
+                        .append(") ");
+
                 String pattern = "%" + keyword.trim().toLowerCase() + "%";
-                params.add(pattern);
-                params.add(pattern);
-                params.add(pattern);
+                for (int i = 0; i < 9; i++) {
+                    params.add(pattern);
+                }
             }
 
-            if (biomarkerFilter != null && !biomarkerFilter.trim().isEmpty()) {
-                if ("yes".equalsIgnoreCase(biomarkerFilter)) {
+            if (hasText(biomarkerFilter)) {
+                if ("yes".equalsIgnoreCase(biomarkerFilter.trim())) {
                     sql.append("AND biomarker_associated = 1 ");
-                } else if ("no".equalsIgnoreCase(biomarkerFilter)) {
+                } else if ("no".equalsIgnoreCase(biomarkerFilter.trim())) {
                     sql.append("AND (biomarker_associated = 0 OR biomarker_associated IS NULL) ");
                 }
             }
 
-            sql.append("ORDER BY name ASC");
+            sql.append("ORDER BY name ASC, id ASC");
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql.toString())) {
-                for (int i = 0; i < params.size(); i++) {
-                    preparedStatement.setObject(i + 1, params.get(i));
-                }
+                bindParams(preparedStatement, params);
 
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
@@ -101,6 +110,10 @@ public class DrugDao extends BaseDao {
     }
 
     public Drug findById(String id) {
+        if (!hasText(id)) {
+            return null;
+        }
+
         final Drug[] result = {null};
 
         DBUtils.execSQL(connection -> {
@@ -109,7 +122,7 @@ public class DrugDao extends BaseDao {
                     "FROM drug WHERE id = ?";
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-                preparedStatement.setString(1, id);
+                preparedStatement.setString(1, id.trim());
 
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
@@ -132,6 +145,7 @@ public class DrugDao extends BaseDao {
         boolean biomarker = resultSet.getBoolean("biomarker");
 
         String description = resultSet.getString("description");
+
         Object biomarkerAssociatedObj = resultSet.getObject("biomarker_associated");
         Boolean biomarkerAssociated = biomarkerAssociatedObj == null
                 ? null
@@ -155,5 +169,15 @@ public class DrugDao extends BaseDao {
                 pubchemId,
                 keggId
         );
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
+    private void bindParams(PreparedStatement preparedStatement, List<Object> params) throws SQLException {
+        for (int i = 0; i < params.size(); i++) {
+            preparedStatement.setObject(i + 1, params.get(i));
+        }
     }
 }

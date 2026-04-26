@@ -120,9 +120,12 @@
         }
     </style>
 </head>
+
 <body>
 <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Precision Medicine Matching System</a>
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="<%=request.getContextPath()%>/">
+        Precision Medicine Matching System
+    </a>
 </nav>
 
 <div class="container-fluid">
@@ -132,6 +135,7 @@
         </jsp:include>
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+
             <div class="pt-3 pb-2 mb-3 border-bottom">
                 <h2>Dosing Guidelines</h2>
                 <div class="page-subtitle">
@@ -142,6 +146,7 @@
             <div class="card search-card mb-4">
                 <div class="card-body">
                     <form method="get" action="<%=request.getContextPath()%>/dosingGuideline" class="form-inline">
+
                         <div class="form-group mr-3 mb-2">
                             <label for="keyword" class="mr-2">Keyword</label>
                             <input type="text"
@@ -175,12 +180,16 @@
             </div>
 
             <c:choose>
-                <c:when test="${dosingGuidelines != null && !dosingGuidelines.isEmpty()}">
+                <c:when test="${not empty dosingGuidelines}">
                     <div class="result-count">
                         Total guidelines shown: ${dosingGuidelines.size()}
                     </div>
 
                     <c:forEach items="${dosingGuidelines}" var="item">
+                        <c:url var="dosingGuidelineDetailUrl" value="/dosingGuidelineDetail">
+                            <c:param name="id" value="${item.id}" />
+                        </c:url>
+
                         <div class="guideline-card">
                             <div class="guideline-header">
                                 <div class="guideline-title">
@@ -227,7 +236,7 @@
 
                             <div class="guideline-links">
                                 <span>
-                                    <a href="<%=request.getContextPath()%>/dosingGuidelineDetail?id=${item.id}" class="btn btn-outline-primary btn-sm">
+                                    <a href="${dosingGuidelineDetailUrl}" class="btn btn-outline-primary btn-sm">
                                         View Detail
                                     </a>
                                 </span>
@@ -250,6 +259,7 @@
                     </div>
                 </c:otherwise>
             </c:choose>
+
         </main>
     </div>
 </div>

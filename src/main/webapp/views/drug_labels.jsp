@@ -120,9 +120,12 @@
         }
     </style>
 </head>
+
 <body>
 <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Precision Medicine Matching System</a>
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="<%=request.getContextPath()%>/">
+        Precision Medicine Matching System
+    </a>
 </nav>
 
 <div class="container-fluid">
@@ -132,6 +135,7 @@
         </jsp:include>
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+
             <div class="pt-3 pb-2 mb-3 border-bottom">
                 <h2>Drug Labels</h2>
                 <div class="page-subtitle">
@@ -142,6 +146,7 @@
             <div class="card search-card mb-4">
                 <div class="card-body">
                     <form method="get" action="<%=request.getContextPath()%>/drugLabels" class="form-inline">
+
                         <div class="form-group mr-3 mb-2">
                             <label for="keyword" class="mr-2">Keyword</label>
                             <input type="text"
@@ -172,12 +177,16 @@
             </div>
 
             <c:choose>
-                <c:when test="${drugLabels != null && !drugLabels.isEmpty()}">
+                <c:when test="${not empty drugLabels}">
                     <div class="result-count">
                         Total labels shown: ${drugLabels.size()}
                     </div>
 
                     <c:forEach items="${drugLabels}" var="item">
+                        <c:url var="drugLabelDetailUrl" value="/drugLabelDetail">
+                            <c:param name="id" value="${item.id}" />
+                        </c:url>
+
                         <div class="label-card">
                             <div class="label-header">
                                 <div class="label-title">
@@ -224,7 +233,7 @@
 
                             <div class="label-links">
                                 <span>
-                                    <a href="<%=request.getContextPath()%>/drugLabelDetail?id=${item.id}" class="btn btn-outline-primary btn-sm">
+                                    <a href="${drugLabelDetailUrl}" class="btn btn-outline-primary btn-sm">
                                         View Detail
                                     </a>
                                 </span>
@@ -255,6 +264,7 @@
                     </div>
                 </c:otherwise>
             </c:choose>
+
         </main>
     </div>
 </div>

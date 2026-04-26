@@ -74,9 +74,12 @@
         }
     </style>
 </head>
+
 <body>
 <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Precision Medicine Matching System</a>
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="<%=request.getContextPath()%>/">
+        Precision Medicine Matching System
+    </a>
 </nav>
 
 <div class="container-fluid">
@@ -86,108 +89,126 @@
         </jsp:include>
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+
             <div class="pt-3 pb-2 mb-3 border-bottom d-flex justify-content-between align-items-center">
                 <h2 class="mb-0">Drug Detail</h2>
-                <a href="<%=request.getContextPath()%>/drugs" class="btn btn-secondary btn-sm">Back to Drug List</a>
+                <a href="<%=request.getContextPath()%>/drugs" class="btn btn-secondary btn-sm">
+                    Back to Drug List
+                </a>
             </div>
 
-            <c:if test="${drug != null}">
-                <div class="detail-card">
-                    <h3 class="mb-3">
-                        <c:out value="${drug.name}" />
-                        <span class="drug-id-badge"><c:out value="${drug.id}" /></span>
-                    </h3>
+            <c:choose>
+                <c:when test="${drug != null}">
+                    <div class="detail-card">
+                        <h3 class="mb-3">
+                            <c:out value="${drug.name}" />
+                            <span class="drug-id-badge"><c:out value="${drug.id}" /></span>
+                        </h3>
 
-                    <div class="info-row">
-                        <span class="info-label">Category:</span>
-                        <c:choose>
-                            <c:when test="${drug.objCls != null && drug.objCls != ''}">
-                                <c:out value="${drug.objCls}" />
-                            </c:when>
-                            <c:otherwise>Unknown</c:otherwise>
-                        </c:choose>
-                    </div>
+                        <div class="info-row">
+                            <span class="info-label">Category:</span>
+                            <c:choose>
+                                <c:when test="${drug.objCls != null && drug.objCls != ''}">
+                                    <c:out value="${drug.objCls}" />
+                                </c:when>
+                                <c:otherwise>Unknown</c:otherwise>
+                            </c:choose>
+                        </div>
 
-                    <div class="info-row">
-                        <span class="info-label">Biomarker-associated:</span>
-                        <c:choose>
-                            <c:when test="${drug.biomarkerAssociated == true}">
-                                <span class="biomarker-yes">Yes</span>
-                            </c:when>
-                            <c:when test="${drug.biomarkerAssociated == false}">
-                                <span class="biomarker-no">No</span>
-                            </c:when>
-                            <c:otherwise>
-                                <span class="biomarker-unknown">Unknown</span>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
+                        <div class="info-row">
+                            <span class="info-label">Biomarker-associated:</span>
+                            <c:choose>
+                                <c:when test="${drug.biomarkerAssociated == true}">
+                                    <span class="biomarker-yes">Yes</span>
+                                </c:when>
+                                <c:when test="${drug.biomarkerAssociated == false}">
+                                    <span class="biomarker-no">No</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="biomarker-unknown">Unknown</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
 
-                    <div class="section-title">Description</div>
-                    <div class="description-box">
-                        <c:choose>
-                            <c:when test="${drug.description != null && drug.description != ''}">
-                                <c:out value="${drug.description}" />
-                            </c:when>
-                            <c:otherwise>
-                                No description is currently available for this drug.
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
+                        <div class="section-title">Description</div>
+                        <div class="description-box">
+                            <c:choose>
+                                <c:when test="${drug.description != null && drug.description != ''}">
+                                    <c:out value="${drug.description}" />
+                                </c:when>
+                                <c:otherwise>
+                                    No description is currently available for this drug.
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
 
-                    <div class="section-title">Platform Reference</div>
-                    <div class="info-row">
-                        <span class="info-label">Platform URL:</span>
-                        <c:choose>
-                            <c:when test="${drug.drugUrl != null && drug.drugUrl != ''}">
-                                <a href="https://www.pharmgkb.org${drug.drugUrl}" target="_blank">Open PharmGKB Page</a>
-                            </c:when>
-                            <c:otherwise>Not available</c:otherwise>
-                        </c:choose>
-                    </div>
+                        <div class="section-title">Platform Reference</div>
+                        <div class="info-row">
+                            <span class="info-label">Platform URL:</span>
+                            <c:choose>
+                                <c:when test="${drug.drugUrl != null && drug.drugUrl != ''}">
+                                    <a href="https://www.pharmgkb.org${drug.drugUrl}" target="_blank">
+                                        Open PharmGKB Page
+                                    </a>
+                                </c:when>
+                                <c:otherwise>Not available</c:otherwise>
+                            </c:choose>
+                        </div>
 
-                    <div class="section-title">External Database IDs</div>
-                    <div class="info-row">
-                        <span class="info-label">PharmGKB ID:</span>
-                        <c:choose>
-                            <c:when test="${drug.pharmgkbId != null && drug.pharmgkbId != ''}">
-                                <c:out value="${drug.pharmgkbId}" />
-                            </c:when>
-                            <c:otherwise>Not available</c:otherwise>
-                        </c:choose>
-                    </div>
+                        <div class="section-title">External Database IDs</div>
 
-                    <div class="info-row">
-                        <span class="info-label">DrugBank ID:</span>
-                        <c:choose>
-                            <c:when test="${drug.drugbankId != null && drug.drugbankId != ''}">
-                                <c:out value="${drug.drugbankId}" />
-                            </c:when>
-                            <c:otherwise>Not available</c:otherwise>
-                        </c:choose>
-                    </div>
+                        <div class="info-row">
+                            <span class="info-label">PharmGKB ID:</span>
+                            <c:choose>
+                                <c:when test="${drug.pharmgkbId != null && drug.pharmgkbId != ''}">
+                                    <c:out value="${drug.pharmgkbId}" />
+                                </c:when>
+                                <c:otherwise>Not available</c:otherwise>
+                            </c:choose>
+                        </div>
 
-                    <div class="info-row">
-                        <span class="info-label">PubChem ID:</span>
-                        <c:choose>
-                            <c:when test="${drug.pubchemId != null && drug.pubchemId != ''}">
-                                <c:out value="${drug.pubchemId}" />
-                            </c:when>
-                            <c:otherwise>Not available</c:otherwise>
-                        </c:choose>
-                    </div>
+                        <div class="info-row">
+                            <span class="info-label">DrugBank ID:</span>
+                            <c:choose>
+                                <c:when test="${drug.drugbankId != null && drug.drugbankId != ''}">
+                                    <c:out value="${drug.drugbankId}" />
+                                </c:when>
+                                <c:otherwise>Not available</c:otherwise>
+                            </c:choose>
+                        </div>
 
-                    <div class="info-row">
-                        <span class="info-label">KEGG ID:</span>
-                        <c:choose>
-                            <c:when test="${drug.keggId != null && drug.keggId != ''}">
-                                <c:out value="${drug.keggId}" />
-                            </c:when>
-                            <c:otherwise>Not available</c:otherwise>
-                        </c:choose>
+                        <div class="info-row">
+                            <span class="info-label">PubChem ID:</span>
+                            <c:choose>
+                                <c:when test="${drug.pubchemId != null && drug.pubchemId != ''}">
+                                    <c:out value="${drug.pubchemId}" />
+                                </c:when>
+                                <c:otherwise>Not available</c:otherwise>
+                            </c:choose>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">KEGG ID:</span>
+                            <c:choose>
+                                <c:when test="${drug.keggId != null && drug.keggId != ''}">
+                                    <c:out value="${drug.keggId}" />
+                                </c:when>
+                                <c:otherwise>Not available</c:otherwise>
+                            </c:choose>
+                        </div>
                     </div>
-                </div>
-            </c:if>
+                </c:when>
+
+                <c:otherwise>
+                    <div class="alert alert-warning" role="alert">
+                        Drug record was not found.
+                    </div>
+                    <a href="<%=request.getContextPath()%>/drugs" class="btn btn-primary btn-sm">
+                        Back to Drug List
+                    </a>
+                </c:otherwise>
+            </c:choose>
+
         </main>
     </div>
 </div>

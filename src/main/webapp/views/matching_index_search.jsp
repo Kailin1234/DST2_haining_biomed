@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: hello
-  Date: 2019-12-3
-  Time: 15:37
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isELIgnored="false" %>
@@ -22,21 +15,6 @@
     <link href="<%=request.getContextPath()%>/static/css/app.css" rel="stylesheet">
 
     <style>
-        .bd-placeholder-img {
-            font-size: 1.125rem;
-            text-anchor: middle;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        @media (min-width: 768px) {
-            .bd-placeholder-img-lg {
-                font-size: 3.5rem;
-            }
-        }
-
         .gene-badge {
             display: inline-block;
             margin: 0 6px 6px 0;
@@ -53,9 +31,12 @@
         }
     </style>
 </head>
+
 <body>
 <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Precision Medicine Matching System</a>
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="<%=request.getContextPath()%>/">
+        Precision Medicine Matching System
+    </a>
 </nav>
 
 <div class="container-fluid">
@@ -65,8 +46,14 @@
         </jsp:include>
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h2>Matching Result</h2>
+                <div>
+                    <h2>Matching Result</h2>
+                    <p class="text-muted mb-0">
+                        Review extracted genes and matched drug label records.
+                    </p>
+                </div>
             </div>
 
             <c:if test="${sample != null}">
@@ -75,26 +62,27 @@
                         <h5 class="card-title">Sample Information</h5>
                         <p class="mb-1"><strong>Sample ID:</strong> ${sample.id}</p>
                         <p class="mb-1"><strong>Uploaded at:</strong> ${sample.createdAt}</p>
-                        <p class="mb-0"><strong>Uploaded by:</strong> ${sample.uploadedBy}</p>
+                        <p class="mb-0"><strong>Uploaded by:</strong> <c:out value="${sample.uploadedBy}" /></p>
                     </div>
                 </div>
             </c:if>
 
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Matched Genes</h5>
+                    <h5 class="card-title">Extracted Genes Used for Matching</h5>
 
                     <c:choose>
-                        <c:when test="${refGenes != null && !refGenes.isEmpty()}">
+                        <c:when test="${not empty refGenes}">
                             <p class="mb-2">
-                                <strong>Total matched genes:</strong> ${refGenes.size()}
+                                <strong>Total extracted genes:</strong> ${refGenes.size()}
                             </p>
                             <div>
                                 <c:forEach items="${refGenes}" var="gene">
-                                    <span class="gene-badge">${gene}</span>
+                                    <span class="gene-badge"><c:out value="${gene}" /></span>
                                 </c:forEach>
                             </div>
                         </c:when>
+
                         <c:otherwise>
                             <div class="alert alert-warning mb-0" role="alert">
                                 No valid genes were extracted from this sample for matching.
@@ -109,7 +97,7 @@
                     <h5 class="card-title">Matched Drug Labels</h5>
 
                     <c:choose>
-                        <c:when test="${matched != null && !matched.isEmpty()}">
+                        <c:when test="${not empty matched}">
                             <p class="mb-3">
                                 <strong>Total matched drug labels:</strong> ${matched.size()}
                             </p>
@@ -124,6 +112,7 @@
                                         <th>Summary</th>
                                     </tr>
                                     </thead>
+
                                     <tbody>
                                     <c:forEach items="${matched}" var="item" varStatus="loop">
                                         <tr>
@@ -137,6 +126,7 @@
                                 </table>
                             </div>
                         </c:when>
+
                         <c:otherwise>
                             <div class="alert alert-warning mb-0" role="alert">
                                 No drug labels were matched for this sample.
@@ -147,9 +137,14 @@
             </div>
 
             <div class="mb-4">
-                <a href="<%=request.getContextPath()%>/matchingIndex" class="btn btn-primary mr-2">Upload Another File</a>
-                <a href="<%=request.getContextPath()%>/samples" class="btn btn-secondary">View All Samples</a>
+                <a href="<%=request.getContextPath()%>/matchingIndex" class="btn btn-primary mr-2">
+                    Upload Another File
+                </a>
+                <a href="<%=request.getContextPath()%>/samples" class="btn btn-secondary">
+                    View All Samples
+                </a>
             </div>
+
         </main>
     </div>
 </div>

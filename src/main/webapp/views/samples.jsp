@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: hello
-  Date: 2019-12-3
-  Time: 15:37
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isELIgnored="false" %>
@@ -20,27 +13,13 @@
     <script src="<%=request.getContextPath()%>/static/jquery/jquery-3.4.1.js"></script>
     <script src="<%=request.getContextPath()%>/static/bootstrap/js/bootstrap.bundle.min.js"></script>
     <link href="<%=request.getContextPath()%>/static/css/app.css" rel="stylesheet">
-
-    <style>
-        .bd-placeholder-img {
-            font-size: 1.125rem;
-            text-anchor: middle;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        @media (min-width: 768px) {
-            .bd-placeholder-img-lg {
-                font-size: 3.5rem;
-            }
-        }
-    </style>
 </head>
+
 <body>
 <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Precision Medicine Matching System</a>
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="<%=request.getContextPath()%>/">
+        Precision Medicine Matching System
+    </a>
 </nav>
 
 <div class="container-fluid">
@@ -50,15 +29,24 @@
         </jsp:include>
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h2>Sample Records</h2>
                 <div>
-                    <a href="<%=request.getContextPath()%>/matchingIndex" class="btn btn-primary btn-sm">Upload New File</a>
+                    <h2>Sample Records</h2>
+                    <p class="text-muted mb-0">
+                        Review uploaded samples and open previous matching results.
+                    </p>
+                </div>
+
+                <div>
+                    <a href="<%=request.getContextPath()%>/matchingIndex" class="btn btn-primary btn-sm">
+                        Upload New File
+                    </a>
                 </div>
             </div>
 
             <c:choose>
-                <c:when test="${samples != null && !samples.isEmpty()}">
+                <c:when test="${not empty samples}">
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered table-sm">
                             <thead class="thead-light">
@@ -66,9 +54,10 @@
                                 <th style="width: 80px;">Sample ID</th>
                                 <th style="width: 180px;">Uploaded By</th>
                                 <th style="width: 220px;">Uploaded At</th>
-                                <th style="width: 120px;">Action</th>
+                                <th style="width: 140px;">Action</th>
                             </tr>
                             </thead>
+
                             <tbody>
                             <c:forEach items="${samples}" var="item">
                                 <tr>
@@ -76,7 +65,8 @@
                                     <td><c:out value="${item.uploadedBy}" /></td>
                                     <td>${item.createdAt}</td>
                                     <td>
-                                        <a href="<%=request.getContextPath()%>/matching?sampleId=${item.id}" class="btn btn-outline-primary btn-sm">
+                                        <a href="<%=request.getContextPath()%>/matching?sampleId=${item.id}"
+                                           class="btn btn-outline-primary btn-sm">
                                             View Result
                                         </a>
                                     </td>
@@ -91,9 +81,13 @@
                     <div class="alert alert-info" role="alert">
                         No sample records are available yet.
                     </div>
-                    <a href="<%=request.getContextPath()%>/matchingIndex" class="btn btn-primary">Upload Your First File</a>
+
+                    <a href="<%=request.getContextPath()%>/matchingIndex" class="btn btn-primary">
+                        Upload Your First File
+                    </a>
                 </c:otherwise>
             </c:choose>
+
         </main>
     </div>
 </div>

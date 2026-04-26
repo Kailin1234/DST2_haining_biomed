@@ -69,9 +69,12 @@
         }
     </style>
 </head>
+
 <body>
 <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Precision Medicine Matching System</a>
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="<%=request.getContextPath()%>/">
+        Precision Medicine Matching System
+    </a>
 </nav>
 
 <div class="container-fluid">
@@ -81,91 +84,116 @@
         </jsp:include>
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+
             <div class="pt-3 pb-2 mb-3 border-bottom d-flex justify-content-between align-items-center">
                 <h2 class="mb-0">Dosing Guideline Detail</h2>
-                <a href="<%=request.getContextPath()%>/dosingGuideline" class="btn btn-secondary btn-sm">Back to Guideline List</a>
+                <a href="<%=request.getContextPath()%>/dosingGuideline" class="btn btn-secondary btn-sm">
+                    Back to Guideline List
+                </a>
             </div>
 
-            <c:if test="${dosingGuideline != null}">
-                <div class="detail-card">
-                    <h3 class="mb-3">
-                        <c:out value="${dosingGuideline.name}" />
-                        <span class="guideline-id-badge"><c:out value="${dosingGuideline.id}" /></span>
-                    </h3>
+            <c:choose>
+                <c:when test="${dosingGuideline != null}">
+                    <div class="detail-card">
+                        <h3 class="mb-3">
+                            <c:out value="${dosingGuideline.name}" />
+                            <span class="guideline-id-badge"><c:out value="${dosingGuideline.id}" /></span>
+                        </h3>
 
-                    <div class="info-row">
-                        <span class="info-label">Source:</span>
-                        <c:out value="${dosingGuideline.source}" />
-                    </div>
+                        <div class="info-row">
+                            <span class="info-label">Source:</span>
+                            <c:choose>
+                                <c:when test="${dosingGuideline.source != null && dosingGuideline.source != ''}">
+                                    <c:out value="${dosingGuideline.source}" />
+                                </c:when>
+                                <c:otherwise>Not available</c:otherwise>
+                            </c:choose>
+                        </div>
 
-                    <div class="info-row">
-                        <span class="info-label">Drug ID:</span>
-                        <c:out value="${dosingGuideline.drugId}" />
-                    </div>
+                        <div class="info-row">
+                            <span class="info-label">Drug ID:</span>
+                            <c:choose>
+                                <c:when test="${dosingGuideline.drugId != null && dosingGuideline.drugId != ''}">
+                                    <c:out value="${dosingGuideline.drugId}" />
+                                </c:when>
+                                <c:otherwise>Not available</c:otherwise>
+                            </c:choose>
+                        </div>
 
-                    <div class="info-row">
-                        <span class="info-label">Recommendation:</span>
-                        <c:choose>
-                            <c:when test="${dosingGuideline.recommendation}">
-                                <span class="flag-yes">Yes</span>
-                            </c:when>
-                            <c:otherwise>
-                                <span class="flag-no">No</span>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
+                        <div class="info-row">
+                            <span class="info-label">Recommendation:</span>
+                            <c:choose>
+                                <c:when test="${dosingGuideline.recommendation}">
+                                    <span class="flag-yes">Yes</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="flag-no">No</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
 
-                    <div class="info-row">
-                        <span class="info-label">Condition type:</span>
-                        <c:choose>
-                            <c:when test="${dosingGuideline.conditionType != null && dosingGuideline.conditionType != ''}">
-                                <c:out value="${dosingGuideline.conditionType}" />
-                            </c:when>
-                            <c:otherwise>Not available</c:otherwise>
-                        </c:choose>
-                    </div>
+                        <div class="info-row">
+                            <span class="info-label">Condition type:</span>
+                            <c:choose>
+                                <c:when test="${dosingGuideline.conditionType != null && dosingGuideline.conditionType != ''}">
+                                    <c:out value="${dosingGuideline.conditionType}" />
+                                </c:when>
+                                <c:otherwise>Not available</c:otherwise>
+                            </c:choose>
+                        </div>
 
-                    <div class="info-row">
-                        <span class="info-label">Condition value:</span>
-                        <c:choose>
-                            <c:when test="${dosingGuideline.conditionValue != null && dosingGuideline.conditionValue != ''}">
-                                <c:out value="${dosingGuideline.conditionValue}" />
-                            </c:when>
-                            <c:otherwise>Not available</c:otherwise>
-                        </c:choose>
-                    </div>
+                        <div class="info-row">
+                            <span class="info-label">Condition value:</span>
+                            <c:choose>
+                                <c:when test="${dosingGuideline.conditionValue != null && dosingGuideline.conditionValue != ''}">
+                                    <c:out value="${dosingGuideline.conditionValue}" />
+                                </c:when>
+                                <c:otherwise>Not available</c:otherwise>
+                            </c:choose>
+                        </div>
 
-                    <div class="info-row">
-                        <span class="info-label">Evidence level:</span>
-                        <c:choose>
-                            <c:when test="${dosingGuideline.evidenceLevel != null && dosingGuideline.evidenceLevel != ''}">
-                                <c:out value="${dosingGuideline.evidenceLevel}" />
-                            </c:when>
-                            <c:otherwise>Not available</c:otherwise>
-                        </c:choose>
-                    </div>
+                        <div class="info-row">
+                            <span class="info-label">Evidence level:</span>
+                            <c:choose>
+                                <c:when test="${dosingGuideline.evidenceLevel != null && dosingGuideline.evidenceLevel != ''}">
+                                    <c:out value="${dosingGuideline.evidenceLevel}" />
+                                </c:when>
+                                <c:otherwise>Not available</c:otherwise>
+                            </c:choose>
+                        </div>
 
-                    <div class="section-title">Summary</div>
-                    <div class="content-box">
-                        <c:choose>
-                            <c:when test="${dosingGuideline.summaryMarkdown != null && dosingGuideline.summaryMarkdown != ''}">
-                                <c:out value="${dosingGuideline.summaryMarkdown}" />
-                            </c:when>
-                            <c:otherwise>No summary is currently available.</c:otherwise>
-                        </c:choose>
-                    </div>
+                        <div class="section-title">Summary</div>
+                        <div class="content-box">
+                            <c:choose>
+                                <c:when test="${dosingGuideline.summaryMarkdown != null && dosingGuideline.summaryMarkdown != ''}">
+                                    <c:out value="${dosingGuideline.summaryMarkdown}" />
+                                </c:when>
+                                <c:otherwise>No summary is currently available.</c:otherwise>
+                            </c:choose>
+                        </div>
 
-                    <div class="section-title">Full Guideline Text</div>
-                    <div class="content-box">
-                        <c:choose>
-                            <c:when test="${dosingGuideline.textMarkdown != null && dosingGuideline.textMarkdown != ''}">
-                                <c:out value="${dosingGuideline.textMarkdown}" />
-                            </c:when>
-                            <c:otherwise>No detailed text is currently available.</c:otherwise>
-                        </c:choose>
+                        <div class="section-title">Full Guideline Text</div>
+                        <div class="content-box">
+                            <c:choose>
+                                <c:when test="${dosingGuideline.textMarkdown != null && dosingGuideline.textMarkdown != ''}">
+                                    <c:out value="${dosingGuideline.textMarkdown}" />
+                                </c:when>
+                                <c:otherwise>No detailed text is currently available.</c:otherwise>
+                            </c:choose>
+                        </div>
                     </div>
-                </div>
-            </c:if>
+                </c:when>
+
+                <c:otherwise>
+                    <div class="alert alert-warning" role="alert">
+                        Dosing guideline record was not found.
+                    </div>
+                    <a href="<%=request.getContextPath()%>/dosingGuideline" class="btn btn-primary btn-sm">
+                        Back to Guideline List
+                    </a>
+                </c:otherwise>
+            </c:choose>
+
         </main>
     </div>
 </div>

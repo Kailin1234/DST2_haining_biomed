@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 public class KnowledgeBaseController {
@@ -31,13 +32,47 @@ public class KnowledgeBaseController {
         dispatcher.registerGetMapping("/drugLabelDetail", this::drugLabelDetail);
         dispatcher.registerGetMapping("/dosingGuideline", this::dosingGuideline);
         dispatcher.registerGetMapping("/dosingGuidelineDetail", this::dosingGuidelineDetail);
+
+        // Global search entrance
+        dispatcher.registerGetMapping("/search", this::globalSearch);
+    }
+
+    public void globalSearch(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String keyword = request.getParameter("keyword");
+        if (keyword != null) {
+            keyword = keyword.trim();
+        }
+
+        List<Drug> drugResults = Collections.emptyList();
+        List<DrugLabel> labelResults = Collections.emptyList();
+        List<DosingGuideline> guidelineResults = Collections.emptyList();
+
+        if (keyword != null && !keyword.isEmpty()) {
+            drugResults = drugDao.search(keyword, null);
+            labelResults = drugLabelDao.search(keyword, null);
+            guidelineResults = dosingGuidelineDao.search(keyword, null);
+        }
+
+        request.setAttribute("keyword", keyword);
+        request.setAttribute("drugCount", drugResults.size());
+        request.setAttribute("labelCount", labelResults.size());
+        request.setAttribute("guidelineCount", guidelineResults.size());
+
+        request.getRequestDispatcher("/views/search.jsp").forward(request, response);
     }
 
     public void drugs(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String keyword = request.getParameter("keyword");
         String biomarker = request.getParameter("biomarker");
 
+        log.info("[Drug Search] queryString={}, keyword={}, biomarker={}",
+                request.getQueryString(), keyword, biomarker);
+
         List<Drug> drugs = drugDao.search(keyword, biomarker);
+
+        log.info("[Drug Search] result size={}", drugs.size());
 
         request.setAttribute("drugs", drugs);
         request.setAttribute("keyword", keyword);
@@ -46,7 +81,9 @@ public class KnowledgeBaseController {
         request.getRequestDispatcher("/views/drugs.jsp").forward(request, response);
     }
 
-    public void drugDetail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void drugDetail(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         String id = request.getParameter("id");
 
         if (id == null || id.trim().isEmpty()) {
@@ -69,7 +106,12 @@ public class KnowledgeBaseController {
         String keyword = request.getParameter("keyword");
         String source = request.getParameter("source");
 
+        log.info("[Drug Label Search] queryString={}, keyword={}, source={}",
+                request.getQueryString(), keyword, source);
+
         List<DrugLabel> drugLabels = drugLabelDao.search(keyword, source);
+
+        log.info("[Drug Label Search] result size={}", drugLabels.size());
 
         request.setAttribute("drugLabels", drugLabels);
         request.setAttribute("keyword", keyword);
@@ -78,7 +120,9 @@ public class KnowledgeBaseController {
         request.getRequestDispatcher("/views/drug_labels.jsp").forward(request, response);
     }
 
-    public void drugLabelDetail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void drugLabelDetail(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         String id = request.getParameter("id");
 
         if (id == null || id.trim().isEmpty()) {
@@ -101,7 +145,12 @@ public class KnowledgeBaseController {
         String keyword = request.getParameter("keyword");
         String source = request.getParameter("source");
 
+        log.info("[Dosing Guideline Search] queryString={}, keyword={}, source={}",
+                request.getQueryString(), keyword, source);
+
         List<DosingGuideline> dosingGuidelines = dosingGuidelineDao.search(keyword, source);
+
+        log.info("[Dosing Guideline Search] result size={}", dosingGuidelines.size());
 
         request.setAttribute("dosingGuidelines", dosingGuidelines);
         request.setAttribute("keyword", keyword);
@@ -110,7 +159,9 @@ public class KnowledgeBaseController {
         request.getRequestDispatcher("/views/dosing_guideline.jsp").forward(request, response);
     }
 
-    public void dosingGuidelineDetail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void dosingGuidelineDetail(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         String id = request.getParameter("id");
 
         if (id == null || id.trim().isEmpty()) {

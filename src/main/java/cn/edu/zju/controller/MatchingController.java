@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class MatchingController {
 
@@ -53,17 +54,19 @@ public class MatchingController {
 
     public void matching(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
+
         String sampleIdParameter = request.getParameter("sampleId");
-        if (sampleIdParameter == null) {
-            request.getRequestDispatcher("/views/samples.jsp").forward(request, response);
+
+        if (sampleIdParameter == null || sampleIdParameter.trim().isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/samples");
             return;
         }
 
         Integer sampleId;
         try {
-            sampleId = Integer.valueOf(sampleIdParameter);
+            sampleId = Integer.valueOf(sampleIdParameter.trim());
         } catch (NumberFormatException e) {
-            response.sendRedirect("samples");
+            response.sendRedirect(request.getContextPath() + "/samples");
             return;
         }
 
@@ -72,7 +75,7 @@ public class MatchingController {
 
         if (refGenes.isEmpty()) {
             log.info("No refGenes found for sampleId={}", sampleId);
-            response.sendRedirect("samples");
+            response.sendRedirect(request.getContextPath() + "/samples");
             return;
         }
 
@@ -106,7 +109,8 @@ public class MatchingController {
                 }
 
                 String normalizedGene = gene.trim().toUpperCase(Locale.ROOT);
-                if (summaryUpper.contains(normalizedGene)) {
+
+                if (containsGeneToken(summaryUpper, normalizedGene)) {
                     matched = true;
                     break;
                 }
@@ -118,6 +122,15 @@ public class MatchingController {
         }
 
         return matchedLabels;
+    }
+
+    private boolean containsGeneToken(String textUpper, String geneUpper) {
+        if (textUpper == null || textUpper.isBlank() || geneUpper == null || geneUpper.isBlank()) {
+            return false;
+        }
+
+        String regex = "(^|[^A-Z0-9])" + Pattern.quote(geneUpper) + "([^A-Z0-9]|$)";
+        return Pattern.compile(regex).matcher(textUpper).find();
     }
 
     public void uploadMutationFile(HttpServletRequest request, HttpServletResponse response)
@@ -192,7 +205,7 @@ public class MatchingController {
             return;
         }
 
-        response.sendRedirect("matching?sampleId=" + sampleId);
+        response.sendRedirect(request.getContextPath() + "/matching?sampleId=" + sampleId);
     }
 
     private boolean isSupportedExtension(String extension) {
