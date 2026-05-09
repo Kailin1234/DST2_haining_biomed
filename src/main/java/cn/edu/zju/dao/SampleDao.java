@@ -100,6 +100,37 @@ public class SampleDao extends BaseDao {
         return samples;
     }
 
+    public List<Sample> findByUploadedBy(String uploadedBy) {
+        List<Sample> samples = new ArrayList<>();
+
+        DBUtils.execSQL(connection -> {
+            String sql = "SELECT id, created_at, uploaded_by " +
+                    "FROM sample " +
+                    "WHERE uploaded_by = ? " +
+                    "ORDER BY id DESC";
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setString(1, uploadedBy);
+
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        int sampleId = resultSet.getInt("id");
+                        Timestamp createdAtTs = resultSet.getTimestamp("created_at");
+                        Date createdAt = createdAtTs == null ? null : new Date(createdAtTs.getTime());
+                        String recordUploadedBy = resultSet.getString("uploaded_by");
+
+                        Sample sample = new Sample(sampleId, createdAt, recordUploadedBy);
+                        samples.add(sample);
+                    }
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Failed to query samples by uploaded_by: " + uploadedBy, e);
+            }
+        });
+
+        return samples;
+    }
+
     public Sample findById(int id) {
         AtomicReference<Sample> sample = new AtomicReference<>(null);
 

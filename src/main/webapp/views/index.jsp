@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page isELIgnored="false" %>
+<%@ page import="cn.edu.zju.bean.UserAccount" %>
 
 <!doctype html>
 <html lang="en">
@@ -45,6 +46,49 @@
             line-height: 1.7;
             margin-bottom: 0;
             max-width: 1100px;
+        }
+
+        .role-notice {
+            background-color: #ffffff;
+            border: 1px solid #dfe3ea;
+            border-radius: 4px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 6px rgba(31, 41, 51, 0.04);
+        }
+
+        .role-notice-professional {
+            border-left: 5px solid #24476f;
+        }
+
+        .role-notice-general {
+            border-left: 5px solid #6b7280;
+        }
+
+        .role-notice-guest {
+            border-left: 5px solid #9ca3af;
+        }
+
+        .role-notice-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1f2933;
+            margin-bottom: 0.35rem;
+        }
+
+        .role-notice p {
+            color: #4b5563;
+            line-height: 1.65;
+            margin-bottom: 0;
+            font-size: 0.94rem;
+        }
+
+        .role-notice-actions {
+            margin-top: 0.75rem;
+        }
+
+        .role-notice-actions .academic-btn {
+            margin-bottom: 0;
         }
 
         .section-heading {
@@ -211,20 +255,11 @@
 </head>
 
 <body>
-<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="<%=request.getContextPath()%>/">
-        Precision Medicine Matching System
-    </a>
+<%
+    UserAccount loginUser = (UserAccount) session.getAttribute("loginUser");
+%>
 
-    <form class="form-inline w-100 justify-content-end pr-3" action="<%=request.getContextPath()%>/search" method="get">
-        <input class="form-control form-control-sm mr-2"
-               type="text"
-               name="keyword"
-               placeholder="Search drug / label / guideline"
-               aria-label="Search">
-        <button class="btn btn-sm btn-outline-light" type="submit">Search</button>
-    </form>
-</nav>
+<jsp:include page="top_nav.jsp"/>
 
 <div class="container-fluid">
     <div class="row">
@@ -243,6 +278,46 @@
                     information retrieval from mutation data.
                 </p>
             </div>
+
+            <% if (loginUser == null) { %>
+            <div class="role-notice role-notice-guest">
+                <div class="role-notice-title">Public browsing mode</div>
+                <p>
+                    You are not signed in. Public knowledge base pages can still be browsed, including drug records,
+                    drug labels, dosing guideline lists, global search, and help information. Signing in enables
+                    mutation-drug matching, sample record review, and detailed dosing guideline access.
+                </p>
+
+                <div class="role-notice-actions">
+                    <a class="academic-btn" href="<%=request.getContextPath()%>/login">
+                        Sign in
+                    </a>
+                    <a class="academic-btn" href="<%=request.getContextPath()%>/register">
+                        Create an account
+                    </a>
+                </div>
+            </div>
+
+            <% } else if ("professional".equalsIgnoreCase(loginUser.getRole())) { %>
+            <div class="role-notice role-notice-professional">
+                <div class="role-notice-title">Professional user view</div>
+                <p>
+                    You are using the professional-user view. This view is intended for users with relevant biomedical
+                    or clinical background. Detailed drug labels and dosing guideline information can be reviewed
+                    for structured interpretation support together with professional judgement.
+                </p>
+            </div>
+
+            <% } else if ("general".equalsIgnoreCase(loginUser.getRole())) { %>
+            <div class="role-notice role-notice-general">
+                <div class="role-notice-title">General user view</div>
+                <p>
+                    You are using the general-user view. Mutation-drug matching results and guideline records are
+                    provided for educational reference. The information should not replace medical advice and should
+                    be interpreted with support from qualified professionals.
+                </p>
+            </div>
+            <% } %>
 
             <div class="section-heading">
                 <h4>Core Functional Modules</h4>

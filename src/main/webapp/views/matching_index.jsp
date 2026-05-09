@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isELIgnored="false" %>
+<%@ page import="cn.edu.zju.bean.UserAccount" %>
 
 <!doctype html>
 <html lang="en">
@@ -19,15 +20,46 @@
             white-space: pre-wrap;
             word-break: break-word;
         }
+
+        .role-matching-notice {
+            background-color: #ffffff;
+            border: 1px solid #dfe3ea;
+            border-radius: 4px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 2px 6px rgba(31, 41, 51, 0.04);
+        }
+
+        .role-matching-professional {
+            border-left: 5px solid #24476f;
+        }
+
+        .role-matching-general {
+            border-left: 5px solid #6b7280;
+        }
+
+        .role-matching-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1f2933;
+            margin-bottom: 0.35rem;
+        }
+
+        .role-matching-notice p {
+            color: #4b5563;
+            line-height: 1.65;
+            margin-bottom: 0;
+            font-size: 0.94rem;
+        }
     </style>
 </head>
 
 <body>
-<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="<%=request.getContextPath()%>/">
-        Precision Medicine Matching System
-    </a>
-</nav>
+<%
+    UserAccount loginUser = (UserAccount) session.getAttribute("loginUser");
+%>
+
+<jsp:include page="top_nav.jsp"/>
 
 <div class="container-fluid">
     <div class="row">
@@ -45,6 +77,27 @@
                     </p>
                 </div>
             </div>
+
+            <% if (loginUser != null && "professional".equalsIgnoreCase(loginUser.getRole())) { %>
+            <div class="role-matching-notice role-matching-professional">
+                <div class="role-matching-title">Professional user notice</div>
+                <p>
+                    You are using the mutation-drug matching function as a professional user.
+                    The matching result can support structured review of mutation-related drug label information,
+                    but interpretation should still be combined with clinical context, evidence quality,
+                    and professional judgement.
+                </p>
+            </div>
+            <% } else if (loginUser != null && "general".equalsIgnoreCase(loginUser.getRole())) { %>
+            <div class="role-matching-notice role-matching-general">
+                <div class="role-matching-title">General user notice</div>
+                <p>
+                    You are using the mutation-drug matching function as a general user.
+                    Matching results are provided for educational reference only and should not be interpreted
+                    as direct treatment advice. Please discuss any medical interpretation with qualified professionals.
+                </p>
+            </div>
+            <% } %>
 
             <div class="card mb-4">
                 <div class="card-body">
@@ -147,8 +200,12 @@
                                    class="form-control"
                                    id="uploaded_by"
                                    name="uploaded_by"
-                                   placeholder="Enter uploader name"
+                                   value="<%= loginUser != null ? loginUser.getUsername() : "" %>"
+                                   readonly
                                    required>
+                            <small class="form-text text-muted">
+                                The uploader name is automatically linked to the signed-in account.
+                            </small>
                         </div>
 
                         <button type="submit" class="btn btn-primary">

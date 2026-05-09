@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isELIgnored="false" %>
+<%@ page import="cn.edu.zju.bean.UserAccount" %>
 
 <!doctype html>
 <html lang="en">
@@ -29,15 +30,46 @@
             word-break: break-word;
             max-width: 500px;
         }
+
+        .role-result-notice {
+            background-color: #ffffff;
+            border: 1px solid #dfe3ea;
+            border-radius: 4px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 2px 6px rgba(31, 41, 51, 0.04);
+        }
+
+        .role-result-professional {
+            border-left: 5px solid #24476f;
+        }
+
+        .role-result-general {
+            border-left: 5px solid #6b7280;
+        }
+
+        .role-result-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1f2933;
+            margin-bottom: 0.35rem;
+        }
+
+        .role-result-notice p {
+            color: #4b5563;
+            line-height: 1.65;
+            margin-bottom: 0;
+            font-size: 0.94rem;
+        }
     </style>
 </head>
 
 <body>
-<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="<%=request.getContextPath()%>/">
-        Precision Medicine Matching System
-    </a>
-</nav>
+<%
+    UserAccount loginUser = (UserAccount) session.getAttribute("loginUser");
+%>
+
+<jsp:include page="top_nav.jsp"/>
 
 <div class="container-fluid">
     <div class="row">
@@ -55,6 +87,26 @@
                     </p>
                 </div>
             </div>
+
+            <% if (loginUser != null && "professional".equalsIgnoreCase(loginUser.getRole())) { %>
+            <div class="role-result-notice role-result-professional">
+                <div class="role-result-title">Professional result interpretation notice</div>
+                <p>
+                    You are reviewing this matching result as a professional user. The matched drug labels can support
+                    structured review of mutation-related drug information, but the result should be interpreted together
+                    with clinical context, evidence quality, external guideline sources, and professional judgement.
+                </p>
+            </div>
+            <% } else if (loginUser != null && "general".equalsIgnoreCase(loginUser.getRole())) { %>
+            <div class="role-result-notice role-result-general">
+                <div class="role-result-title">General user result interpretation notice</div>
+                <p>
+                    You are reviewing this matching result as a general user. The matched drug labels are provided for
+                    educational reference only and should not be interpreted as direct treatment advice. Please discuss
+                    any medical interpretation with qualified professionals.
+                </p>
+            </div>
+            <% } %>
 
             <c:if test="${sample != null}">
                 <div class="card mb-3">

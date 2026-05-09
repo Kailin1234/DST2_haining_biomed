@@ -25,6 +25,38 @@ public class KnowledgeBaseController {
     private final DrugLabelDao drugLabelDao = new DrugLabelDao();
     private final DosingGuidelineDao dosingGuidelineDao = new DosingGuidelineDao();
 
+    private boolean requireLogin(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        if (request.getSession().getAttribute("loginUser") == null) {
+            String redirect = buildCurrentPath(request);
+            String message = "Please sign in to view detailed dosing guideline information.";
+
+            response.sendRedirect(
+                    request.getContextPath()
+                            + "/login?message=" + java.net.URLEncoder.encode(message, "UTF-8")
+                            + "&redirect=" + java.net.URLEncoder.encode(redirect, "UTF-8")
+            );
+            return false;
+        }
+        return true;
+    }
+
+    private String buildCurrentPath(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        String contextPath = request.getContextPath();
+
+        if (contextPath != null && !contextPath.isEmpty() && uri.startsWith(contextPath)) {
+            uri = uri.substring(contextPath.length());
+        }
+
+        String queryString = request.getQueryString();
+        if (queryString != null && !queryString.isEmpty()) {
+            uri = uri + "?" + queryString;
+        }
+
+        return uri;
+    }
+
     public void register(DispatchServlet.Dispatcher dispatcher) {
         dispatcher.registerGetMapping("/drugs", this::drugs);
         dispatcher.registerGetMapping("/drugDetail", this::drugDetail);
@@ -63,7 +95,8 @@ public class KnowledgeBaseController {
         request.getRequestDispatcher("/views/search.jsp").forward(request, response);
     }
 
-    public void drugs(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void drugs(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         String keyword = request.getParameter("keyword");
         String biomarker = request.getParameter("biomarker");
 
@@ -102,7 +135,8 @@ public class KnowledgeBaseController {
         request.getRequestDispatcher("/views/drug_detail.jsp").forward(request, response);
     }
 
-    public void drugLabels(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void drugLabels(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         String keyword = request.getParameter("keyword");
         String source = request.getParameter("source");
 
@@ -141,7 +175,8 @@ public class KnowledgeBaseController {
         request.getRequestDispatcher("/views/drug_label_detail.jsp").forward(request, response);
     }
 
-    public void dosingGuideline(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void dosingGuideline(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         String keyword = request.getParameter("keyword");
         String source = request.getParameter("source");
 
@@ -161,6 +196,10 @@ public class KnowledgeBaseController {
 
     public void dosingGuidelineDetail(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        if (!requireLogin(request, response)) {
+            return;
+        }
 
         String id = request.getParameter("id");
 

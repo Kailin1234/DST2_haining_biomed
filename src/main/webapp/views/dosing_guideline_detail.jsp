@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isELIgnored="false" %>
+<%@ page import="cn.edu.zju.bean.UserAccount" %>
 
 <!doctype html>
 <html lang="en">
@@ -67,15 +68,46 @@
             color: #856404;
             font-weight: 600;
         }
+
+        .role-guideline-notice {
+            background-color: #ffffff;
+            border: 1px solid #dfe3ea;
+            border-radius: 4px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 2px 6px rgba(31, 41, 51, 0.04);
+        }
+
+        .role-guideline-professional {
+            border-left: 5px solid #24476f;
+        }
+
+        .role-guideline-general {
+            border-left: 5px solid #6b7280;
+        }
+
+        .role-guideline-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1f2933;
+            margin-bottom: 0.35rem;
+        }
+
+        .role-guideline-notice p {
+            color: #4b5563;
+            line-height: 1.65;
+            margin-bottom: 0;
+            font-size: 0.94rem;
+        }
     </style>
 </head>
 
 <body>
-<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="<%=request.getContextPath()%>/">
-        Precision Medicine Matching System
-    </a>
-</nav>
+<%
+    UserAccount loginUser = (UserAccount) session.getAttribute("loginUser");
+%>
+
+<jsp:include page="top_nav.jsp"/>
 
 <div class="container-fluid">
     <div class="row">
@@ -91,6 +123,26 @@
                     Back to Guideline List
                 </a>
             </div>
+
+            <% if (loginUser != null && "professional".equalsIgnoreCase(loginUser.getRole())) { %>
+            <div class="role-guideline-notice role-guideline-professional">
+                <div class="role-guideline-title">Professional interpretation notice</div>
+                <p>
+                    You are viewing this detailed dosing guideline as a professional user. This information can
+                    support structured interpretation of drug-related recommendations, but final interpretation
+                    should still be combined with clinical context, evidence quality, and professional judgement.
+                </p>
+            </div>
+            <% } else if (loginUser != null && "general".equalsIgnoreCase(loginUser.getRole())) { %>
+            <div class="role-guideline-notice role-guideline-general">
+                <div class="role-guideline-title">General user interpretation notice</div>
+                <p>
+                    You are viewing this detailed dosing guideline as a general user. The information is provided
+                    for educational reference only and should not be used as direct medical advice. Please interpret
+                    guideline records with support from qualified professionals.
+                </p>
+            </div>
+            <% } %>
 
             <c:choose>
                 <c:when test="${dosingGuideline != null}">

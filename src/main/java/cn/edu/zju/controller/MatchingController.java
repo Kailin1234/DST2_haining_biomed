@@ -2,6 +2,7 @@ package cn.edu.zju.controller;
 
 import cn.edu.zju.bean.DrugLabel;
 import cn.edu.zju.bean.Sample;
+import cn.edu.zju.bean.UserAccount;
 import cn.edu.zju.dao.AnnovarDao;
 import cn.edu.zju.dao.DrugLabelDao;
 import cn.edu.zju.dao.SampleDao;
@@ -33,6 +34,57 @@ public class MatchingController {
     private final AnnovarDao annovarDao = new AnnovarDao();
     private final DrugLabelDao drugLabelDao = new DrugLabelDao();
 
+    private boolean requireLogin(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        if (request.getSession().getAttribute("loginUser") == null) {
+            String redirect = buildCurrentPath(request);
+            String message = "Please sign in to access mutation analysis and sample records.";
+
+            response.sendRedirect(
+                    request.getContextPath()
+                            + "/login?message=" + java.net.URLEncoder.encode(message, "UTF-8")
+                            + "&redirect=" + java.net.URLEncoder.encode(redirect, "UTF-8")
+            );
+            return false;
+        }
+        return true;
+    }
+
+    private String buildCurrentPath(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        String contextPath = request.getContextPath();
+
+        if (contextPath != null && !contextPath.isEmpty() && uri.startsWith(contextPath)) {
+            uri = uri.substring(contextPath.length());
+        }
+
+        String queryString = request.getQueryString();
+        if (queryString != null && !queryString.isEmpty()) {
+            uri = uri + "?" + queryString;
+        }
+
+        return uri;
+    }
+
+    private UserAccount getLoginUser(HttpServletRequest request) {
+        return (UserAccount) request.getSession().getAttribute("loginUser");
+    }
+
+    private boolean isSampleOwner(Sample sample, UserAccount loginUser) {
+        if (sample == null || loginUser == null) {
+            return false;
+        }
+
+        String sampleUploadedBy = sample.getUploadedBy();
+        String username = loginUser.getUsername();
+
+        if (sampleUploadedBy == null || username == null) {
+            return false;
+        }
+
+        return sampleUploadedBy.equals(username);
+    }
+
     public void register(DispatchServlet.Dispatcher dispatcher) {
         dispatcher.registerPostMapping("/upload", this::uploadMutationFile);
         dispatcher.registerGetMapping("/matchingIndex", this::matchingIndex);
@@ -42,18 +94,47 @@ public class MatchingController {
 
     public void matchingIndex(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
+
+        if (!requireLogin(request, response)) {
+            return;
+        }
+
         request.getRequestDispatcher("/views/matching_index.jsp").forward(request, response);
     }
 
     public void samples(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-        List<Sample> samples = sampleDao.findAll();
+
+        if (!requireLogin(request, response)) {
+            return;
+        }
+
+        UserAccount loginUser = getLoginUser(request);
+
+        if (loginUser == null || loginUser.getUsername() == null || loginUser.getUsername().isBlank()) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        List<Sample> samples = sampleDao.findByUploadedBy(loginUser.getUsername());
+
         request.setAttribute("samples", samples);
         request.getRequestDispatcher("/views/samples.jsp").forward(request, response);
     }
 
     public void matching(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
+
+        if (!requireLogin(request, response)) {
+            return;
+        }
+
+        UserAccount loginUser = getLoginUser(request);
+
+        if (loginUser == null || loginUser.getUsername() == null || loginUser.getUsername().isBlank()) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
 
         String sampleIdParameter = request.getParameter("sampleId");
 
@@ -66,6 +147,20 @@ public class MatchingController {
         try {
             sampleId = Integer.valueOf(sampleIdParameter.trim());
         } catch (NumberFormatException e) {
+            response.sendRedirect(request.getContextPath() + "/samples");
+            return;
+        }
+
+        Sample sample = sampleDao.findById(sampleId);
+
+        if (sample == null) {
+            response.sendRedirect(request.getContextPath() + "/samples");
+            return;
+        }
+
+        if (!isSampleOwner(sample, loginUser)) {
+            log.warn("Unauthorized sample access blocked. username={}, sampleId={}, sampleUploadedBy={}",
+                    loginUser.getUsername(), sampleId, sample.getUploadedBy());
             response.sendRedirect(request.getContextPath() + "/samples");
             return;
         }
@@ -87,7 +182,7 @@ public class MatchingController {
 
         request.setAttribute("matched", matched);
         request.setAttribute("refGenes", refGenes);
-        request.setAttribute("sample", sampleDao.findById(sampleId));
+        request.setAttribute("sample", sample);
         request.getRequestDispatcher("/views/matching_index_search.jsp").forward(request, response);
     }
 
@@ -96,6 +191,7 @@ public class MatchingController {
 
         for (DrugLabel drugLabel : drugLabels) {
             String summary = drugLabel.getSummaryMarkdown();
+
             if (summary == null || summary.isBlank()) {
                 continue;
             }
@@ -136,13 +232,26 @@ public class MatchingController {
     public void uploadMutationFile(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
-        String uploadedBy = request.getParameter("uploaded_by");
+        if (!requireLogin(request, response)) {
+            return;
+        }
+
+        UserAccount loginUser = getLoginUser(request);
+
+        if (loginUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        String uploadedBy = loginUser.getUsername();
+
         if (uploadedBy == null || uploadedBy.isBlank()) {
-            forwardError(request, response, "Uploaded by cannot be blank.");
+            forwardError(request, response, "Current login user is invalid. Please sign in again.");
             return;
         }
 
         Part filePart = request.getPart("annovar");
+
         if (filePart == null || filePart.getSize() == 0) {
             forwardError(request, response, "Mutation file cannot be blank.");
             return;
@@ -224,11 +333,13 @@ public class MatchingController {
         if (fileName == null || !fileName.contains(".")) {
             return "";
         }
+
         return fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase(Locale.ROOT);
     }
 
     private String validateAndNormalizeTableFile(String content) {
         String[] lines = content.split("\\r?\\n");
+
         if (lines.length < 2) {
             throw new IllegalArgumentException("Uploaded table file must contain a header and at least one data row.");
         }
@@ -252,14 +363,18 @@ public class MatchingController {
         }
 
         StringBuilder sb = new StringBuilder();
+
         for (String line : lines) {
             if (line == null || line.isBlank()) {
                 continue;
             }
+
             String[] cols = line.split(delimiterRegex, -1);
+
             for (int i = 0; i < cols.length; i++) {
                 cols[i] = safeField(cols[i]);
             }
+
             sb.append(String.join("\t", cols)).append("\n");
         }
 
@@ -270,19 +385,23 @@ public class MatchingController {
         if (headerLine.contains("\t")) {
             return "\\t";
         }
+
         if (headerLine.contains(",")) {
             return ",";
         }
+
         return null;
     }
 
     private Set<String> toTrimmedHeaderSet(String[] headers) {
         Set<String> headerSet = new HashSet<>();
+
         for (String header : headers) {
             if (header != null) {
                 headerSet.add(header.trim());
             }
         }
+
         return headerSet;
     }
 
@@ -313,13 +432,16 @@ public class MatchingController {
             if (line == null || line.isBlank()) {
                 continue;
             }
+
             if (line.startsWith("##")) {
                 continue;
             }
+
             if (line.startsWith("#CHROM")) {
                 vcfHeader = line;
                 continue;
             }
+
             if (!line.startsWith("#")) {
                 variantLines.add(line);
             }
@@ -340,6 +462,7 @@ public class MatchingController {
 
         for (String line : variantLines) {
             String[] cols = line.split("\t", -1);
+
             if (cols.length < 8) {
                 continue;
             }
@@ -374,8 +497,10 @@ public class MatchingController {
             }
 
             String[] alts = altField.split(",");
+
             for (String alt : alts) {
                 String cleanAlt = alt == null ? "" : alt.trim();
+
                 if (cleanAlt.isBlank()) {
                     continue;
                 }
@@ -405,17 +530,20 @@ public class MatchingController {
 
     private Map<String, String> parseInfoField(String info) {
         Map<String, String> map = new LinkedHashMap<>();
+
         if (info == null || info.isBlank()) {
             return map;
         }
 
         String[] items = info.split(";");
+
         for (String item : items) {
             if (item == null || item.isBlank()) {
                 continue;
             }
 
             int idx = item.indexOf('=');
+
             if (idx > 0) {
                 String key = item.substring(0, idx).trim();
                 String value = item.substring(idx + 1).trim();
@@ -444,9 +572,11 @@ public class MatchingController {
         }
 
         gene = gene.split("[,|&]")[0].trim();
+
         if (gene.isBlank() || ".".equals(gene)) {
             return null;
         }
+
         return gene;
     }
 
@@ -491,6 +621,7 @@ public class MatchingController {
         if (parts.length > 3 && parts[3] != null && !parts[3].isBlank()) {
             return parts[3].trim();
         }
+
         return null;
     }
 
@@ -505,6 +636,7 @@ public class MatchingController {
         if (parts.length > 1 && parts[1] != null && !parts[1].isBlank()) {
             return parts[1].trim();
         }
+
         return null;
     }
 
@@ -534,6 +666,7 @@ public class MatchingController {
         if (parts.length > 1 && parts[1] != null && !parts[1].isBlank()) {
             return parts[1].trim();
         }
+
         return null;
     }
 
@@ -543,21 +676,27 @@ public class MatchingController {
         if (v.contains("missense") || v.contains("nonsynonymous")) {
             return "nonsynonymous SNV";
         }
+
         if (v.contains("synonymous")) {
             return "synonymous SNV";
         }
+
         if (v.contains("stopgain") || v.contains("stop_gained") || v.contains("nonsense")) {
             return "stopgain";
         }
+
         if (v.contains("stoploss") || v.contains("stop_lost")) {
             return "stoploss";
         }
+
         if (v.contains("frameshift")) {
             return "frameshift deletion";
         }
+
         if (v.contains("splic")) {
             return "splicing";
         }
+
         if (v.contains("intron")) {
             return "unknown";
         }
@@ -575,9 +714,11 @@ public class MatchingController {
         if (v.contains("splic")) {
             return "splicing";
         }
+
         if ("unknown".equals(v)) {
             return "unknown";
         }
+
         return "exonic";
     }
 
@@ -591,6 +732,7 @@ public class MatchingController {
                 return value.trim();
             }
         }
+
         return null;
     }
 
@@ -598,6 +740,7 @@ public class MatchingController {
         if (value == null) {
             return "";
         }
+
         return value.replace("\t", " ")
                 .replace("\r", " ")
                 .replace("\n", " ")
@@ -606,6 +749,7 @@ public class MatchingController {
 
     private void forwardError(HttpServletRequest request, HttpServletResponse response, String message)
             throws ServletException, IOException {
+
         request.setAttribute("validateError", message);
         request.getRequestDispatcher("/views/matching_index_error.jsp").forward(request, response);
     }
