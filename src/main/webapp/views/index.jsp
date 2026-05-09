@@ -14,18 +14,198 @@
     <link href="<%=request.getContextPath()%>/static/css/app.css" rel="stylesheet">
 
     <style>
-        .dashboard-card {
-            min-height: 180px;
+        body {
+            background-color: #f7f8fa;
+            color: #202124;
         }
-        .dashboard-card .card-title {
+
+        .academic-page {
+            padding-top: 2.2rem;
+            padding-bottom: 2rem;
+        }
+
+        .academic-welcome {
+            background-color: #ffffff;
+            border: 1px solid #d9dee7;
+            border-left: 5px solid #24476f;
+            border-radius: 4px;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .academic-welcome h3 {
+            font-size: 1.45rem;
             font-weight: 600;
+            color: #1f2933;
+            margin-bottom: 0.75rem;
         }
-        .quick-action {
-            margin-top: 12px;
+
+        .academic-welcome p {
+            color: #4b5563;
+            line-height: 1.7;
+            margin-bottom: 0;
+            max-width: 1100px;
         }
-        .section-subtitle {
-            color: #6c757d;
-            font-size: 0.95rem;
+
+        .section-heading {
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-heading h4 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #1f2933;
+            margin-bottom: 0.25rem;
+        }
+
+        .section-heading p {
+            color: #6b7280;
+            font-size: 0.92rem;
+            margin-bottom: 0;
+        }
+
+        .academic-card {
+            height: 100%;
+            min-height: 245px;
+            background-color: #ffffff;
+            border: 1px solid #dfe3ea;
+            border-radius: 4px;
+            box-shadow: 0 2px 6px rgba(31, 41, 51, 0.04);
+        }
+
+        .academic-card .card-body {
+            padding: 1.35rem 1.45rem;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .module-index {
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: #24476f;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.65rem;
+        }
+
+        .academic-card .card-title {
+            font-size: 1.16rem;
+            font-weight: 600;
+            color: #1f2933;
+            margin-bottom: 0.75rem;
+        }
+
+        .academic-card .card-text {
+            color: #4b5563;
+            line-height: 1.65;
+            margin-bottom: 1.1rem;
+            flex-grow: 1;
+        }
+
+        .academic-actions {
+            margin-top: auto;
+            padding-top: 0.75rem;
+            border-top: 1px solid #edf0f4;
+        }
+
+        .support-actions .academic-btn {
+            display: block;
+            width: fit-content;
+            margin-bottom: 0.55rem;
+        }
+
+        .academic-btn {
+            display: inline-block;
+            font-size: 0.86rem;
+            font-weight: 500;
+            color: #24476f;
+            background-color: #ffffff;
+            border: 1px solid #24476f;
+            border-radius: 3px;
+            padding: 0.36rem 0.72rem;
+            margin-right: 0.45rem;
+            margin-bottom: 0.45rem;
+            text-decoration: none;
+        }
+
+        .academic-btn:hover {
+            color: #ffffff;
+            background-color: #24476f;
+            text-decoration: none;
+        }
+
+        .workflow-panel {
+            background-color: #ffffff;
+            border: 1px solid #dfe3ea;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 6px rgba(31, 41, 51, 0.04);
+        }
+
+        .workflow-header {
+            padding: 1rem 1.35rem;
+            border-bottom: 1px solid #edf0f4;
+            background-color: #fafbfc;
+        }
+
+        .workflow-header h5 {
+            font-size: 1.08rem;
+            font-weight: 600;
+            color: #1f2933;
+            margin-bottom: 0.25rem;
+        }
+
+        .workflow-header p {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        .workflow-body {
+            padding: 1.15rem 1.35rem;
+        }
+
+        .workflow-list {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 0;
+        }
+
+        .workflow-list li {
+            display: flex;
+            align-items: flex-start;
+            padding: 0.65rem 0;
+            border-bottom: 1px solid #edf0f4;
+            color: #374151;
+            font-size: 0.98rem;
+            line-height: 1.65;
+        }
+
+        .workflow-list li:first-child {
+            padding-top: 0;
+        }
+
+        .workflow-list li:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .workflow-number {
+            min-width: 26px;
+            height: 26px;
+            border: 1px solid #24476f;
+            color: #24476f;
+            background-color: #ffffff;
+            font-weight: 600;
+            font-size: 0.82rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.85rem;
+            margin-top: 0.1rem;
         }
     </style>
 </head>
@@ -52,100 +232,140 @@
             <jsp:param name="active" value="dashboard"/>
         </jsp:include>
 
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 academic-page">
 
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <div>
-                    <h2>Dashboard</h2>
-                    <p class="section-subtitle mb-0">
-                        Start mutation-drug matching, review uploaded samples, and browse pharmacogenetic knowledge.
-                    </p>
-                </div>
+            <div class="academic-welcome">
+                <h3>Precision Medicine Matching System</h3>
+                <p>
+                    This platform provides an integrated environment for mutation file upload,
+                    mutation-drug matching, sample record management, and pharmacogenetic knowledge browsing.
+                    It is designed as a structured web-based system to support interpretable drug-related
+                    information retrieval from mutation data.
+                </p>
             </div>
 
-            <div class="jumbotron py-4">
-                <h4>Welcome to Precision Medicine Matching System</h4>
-                <p class="mb-0">
-                    This platform supports mutation file upload, mutation-drug matching,
-                    sample management, and drug knowledge browsing for precision medicine analysis.
+            <div class="section-heading">
+                <h4>Core Functional Modules</h4>
+                <p>
+                    The system is organized into three main functional areas.
                 </p>
             </div>
 
             <div class="row">
 
-                <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="card dashboard-card shadow-sm">
+                <div class="col-md-12 col-lg-4 mb-4">
+                    <div class="card academic-card">
                         <div class="card-body">
-                            <h5 class="card-title">Mutation-Drug Matching</h5>
+                            <div class="module-index">Module 01</div>
+                            <h5 class="card-title">System Support</h5>
+
                             <p class="card-text">
-                                Upload mutation files and generate medication-related matching results.
+                                Provides global search and basic usage guidance to help users locate
+                                records and understand input requirements before starting the analysis.
                             </p>
-                            <a class="btn btn-primary btn-sm quick-action"
-                               href="<%=request.getContextPath()%>/matchingIndex">
-                                Start Matching
-                            </a>
+
+                            <div class="academic-actions support-actions">
+                                <a class="academic-btn" href="<%=request.getContextPath()%>/search">
+                                    Global Search
+                                </a>
+                                <a class="academic-btn" href="<%=request.getContextPath()%>/help">
+                                    Help / Tutorial
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="card dashboard-card shadow-sm">
+                <div class="col-md-12 col-lg-4 mb-4">
+                    <div class="card academic-card">
                         <div class="card-body">
-                            <h5 class="card-title">Sample Records</h5>
+                            <div class="module-index">Module 02</div>
+                            <h5 class="card-title">Mutation Analysis</h5>
+
                             <p class="card-text">
-                                Review uploaded samples and track previous analysis records.
+                                Supports mutation file upload, gene-level information extraction,
+                                mutation-drug matching, and review of previously uploaded sample records.
                             </p>
-                            <a class="btn btn-primary btn-sm quick-action"
-                               href="<%=request.getContextPath()%>/samples">
-                                View Samples
-                            </a>
+
+                            <div class="academic-actions">
+                                <a class="academic-btn" href="<%=request.getContextPath()%>/matchingIndex">
+                                    Mutation-Drug Matching
+                                </a>
+                                <a class="academic-btn" href="<%=request.getContextPath()%>/samples">
+                                    Sample Records
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="card dashboard-card shadow-sm">
+                <div class="col-md-12 col-lg-4 mb-4">
+                    <div class="card academic-card">
                         <div class="card-body">
-                            <h5 class="card-title">Drug Knowledge Base</h5>
-                            <p class="card-text">
-                                Browse drugs, drug labels, and dosing guideline information.
-                            </p>
-                            <a class="btn btn-primary btn-sm quick-action"
-                               href="<%=request.getContextPath()%>/drugs">
-                                Browse Drugs
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                            <div class="module-index">Module 03</div>
+                            <h5 class="card-title">Knowledge Base</h5>
 
-                <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="card dashboard-card shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">Search & Help</h5>
                             <p class="card-text">
-                                Search across knowledge modules or check the basic usage guide.
+                                Provides structured access to drug information, pharmacogenetic drug labels,
+                                dosing guideline records, biomarkers, and related reference information.
                             </p>
-                            <a class="btn btn-primary btn-sm quick-action"
-                               href="<%=request.getContextPath()%>/help">
-                                View Help
-                            </a>
+
+                            <div class="academic-actions">
+                                <a class="academic-btn" href="<%=request.getContextPath()%>/drugs">
+                                    Drugs
+                                </a>
+                                <a class="academic-btn" href="<%=request.getContextPath()%>/drugLabels">
+                                    Drug Labels
+                                </a>
+                                <a class="academic-btn" href="<%=request.getContextPath()%>/dosingGuideline">
+                                    Dosing Guideline
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
 
             </div>
 
-            <div class="card mt-2 mb-4">
-                <div class="card-header">
-                    Suggested Workflow
+            <div class="workflow-panel">
+                <div class="workflow-header">
+                    <h5>Suggested Workflow</h5>
+                    <p>
+                        A typical use process begins with system guidance and ends with knowledge base review.
+                    </p>
                 </div>
-                <div class="card-body">
-                    <ol class="mb-0">
-                        <li>Upload a mutation file through the Matching page.</li>
-                        <li>The system parses mutation information and performs drug-related matching.</li>
-                        <li>Review the matching result and explanation.</li>
-                        <li>Check related drug labels and dosing guidelines in the knowledge base.</li>
-                    </ol>
+
+                <div class="workflow-body">
+                    <ul class="workflow-list">
+                        <li>
+                            <span class="workflow-number">1</span>
+                            <span>
+                                Use Global Search or Help / Tutorial to understand available records
+                                and input requirements.
+                            </span>
+                        </li>
+
+                        <li>
+                            <span class="workflow-number">2</span>
+                            <span>
+                                Upload a mutation file through the Mutation-Drug Matching page.
+                            </span>
+                        </li>
+
+                        <li>
+                            <span class="workflow-number">3</span>
+                            <span>
+                                The system parses mutation information and performs drug-related matching.
+                            </span>
+                        </li>
+
+                        <li>
+                            <span class="workflow-number">4</span>
+                            <span>
+                                Review related drug labels and dosing guidelines in the knowledge base.
+                            </span>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
