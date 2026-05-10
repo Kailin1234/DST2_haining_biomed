@@ -25,26 +25,10 @@ public class KnowledgeBaseController {
     private final DrugLabelDao drugLabelDao = new DrugLabelDao();
     private final DosingGuidelineDao dosingGuidelineDao = new DosingGuidelineDao();
 
-    private boolean requireLogin(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-
-        if (request.getSession().getAttribute("loginUser") == null) {
-
-            String redirect = buildCurrentPath(request);
-            String message = "Please sign in to view detailed dosing guideline information.";
-
-            response.sendRedirect(
-                    request.getContextPath()
-                            + "/login?message=" + java.net.URLEncoder.encode(message, "UTF-8")
-                            + "&redirect=" + java.net.URLEncoder.encode(redirect, "UTF-8")
-            );
-
-            return false;
-        }
-
-        return true;
-    }
-
+    /**
+     * Build current request path with query string.
+     * This is used for redirecting visitor back after login.
+     */
     private String buildCurrentPath(HttpServletRequest request) {
 
         String uri = request.getRequestURI();
@@ -61,6 +45,54 @@ public class KnowledgeBaseController {
         }
 
         return uri;
+    }
+
+    /**
+     * Only professional users can view dosing guideline detail.
+     *
+     * Visitor:
+     * - redirected to login page.
+     *
+     * General user:
+     * - redirected back to dosing guideline list with a message.
+     *
+     * Professional user:
+     * - allowed to continue.
+     */
+    private boolean requireProfessionalForDosingDetail(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        UserAccount loginUser = (UserAccount) request.getSession().getAttribute("loginUser");
+
+        if (loginUser == null) {
+
+            String redirect = buildCurrentPath(request);
+            String message = "Please sign in with a professional account to view detailed dosing guideline information.";
+
+            response.sendRedirect(
+                    request.getContextPath()
+                            + "/login?message=" + java.net.URLEncoder.encode(message, "UTF-8")
+                            + "&redirect=" + java.net.URLEncoder.encode(redirect, "UTF-8")
+            );
+
+            return false;
+        }
+
+        String role = loginUser.getRole();
+
+        if (role == null || !"professional".equalsIgnoreCase(role.trim())) {
+
+            String message = "Dosing guideline detail is only available to professional users.";
+
+            response.sendRedirect(
+                    request.getContextPath()
+                            + "/dosingGuideline?message=" + java.net.URLEncoder.encode(message, "UTF-8")
+            );
+
+            return false;
+        }
+
+        return true;
     }
 
     public void register(DispatchServlet.Dispatcher dispatcher) {
@@ -179,6 +211,7 @@ public class KnowledgeBaseController {
 
         String keyword = request.getParameter("keyword");
         String source = request.getParameter("source");
+        String message = request.getParameter("message");
 
         log.info("[Dosing Guideline Search] queryString={}, keyword={}, source={}",
                 request.getQueryString(), keyword, source);
@@ -190,6 +223,7 @@ public class KnowledgeBaseController {
         request.setAttribute("dosingGuidelines", dosingGuidelines);
         request.setAttribute("keyword", keyword);
         request.setAttribute("source", source);
+        request.setAttribute("message", message);
 
         request.getRequestDispatcher("/views/dosing_guideline.jsp").forward(request, response);
     }
@@ -197,7 +231,7 @@ public class KnowledgeBaseController {
     public void dosingGuidelineDetail(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        if (!requireLogin(request, response)) {
+        if (!requireProfessionalForDosingDetail(request, response)) {
             return;
         }
 

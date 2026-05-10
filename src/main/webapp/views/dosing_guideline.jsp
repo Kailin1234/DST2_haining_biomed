@@ -1,6 +1,20 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isELIgnored="false" %>
+<%@ page import="cn.edu.zju.bean.UserAccount" %>
+
+<%
+    UserAccount loginUser = (UserAccount) session.getAttribute("loginUser");
+
+    boolean isLoggedIn = loginUser != null;
+    boolean isProfessional = false;
+    boolean isGeneral = false;
+
+    if (loginUser != null && loginUser.getRole() != null) {
+        isProfessional = "professional".equalsIgnoreCase(loginUser.getRole());
+        isGeneral = "general".equalsIgnoreCase(loginUser.getRole());
+    }
+%>
 
 <!doctype html>
 <html lang="en">
@@ -22,6 +36,31 @@
         .page-subtitle {
             color: #6c757d;
             margin-bottom: 1rem;
+        }
+
+        .access-note {
+            border: 1px solid #e5e9f0;
+            border-left: 5px solid #6b7280;
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            color: #4b5563;
+            font-size: 0.92rem;
+            line-height: 1.45;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+        }
+
+        .access-note-professional {
+            border-left-color: #2563eb;
+        }
+
+        .access-note-general {
+            border-left-color: #6b7280;
+        }
+
+        .access-note-visitor {
+            border-left-color: #9ca3af;
         }
 
         .search-card {
@@ -138,6 +177,20 @@
             background-color: #e2e3e5;
         }
 
+        .btn-professional-only {
+            color: #6c757d;
+            background-color: #e9ecef;
+            border-color: #ced4da;
+            cursor: not-allowed;
+        }
+
+        .small-access-hint {
+            font-size: 0.78rem;
+            color: #6c757d;
+            margin-top: 4px;
+            text-align: right;
+        }
+
         @media (max-width: 768px) {
             .form-inline {
                 display: block;
@@ -162,6 +215,10 @@
             .guideline-actions {
                 margin-top: 14px;
             }
+
+            .small-access-hint {
+                text-align: left;
+            }
         }
     </style>
 </head>
@@ -185,6 +242,26 @@
                     Browse dosing recommendations and pharmacogenomic guideline records with quick search and source filtering.
                 </div>
             </div>
+
+            <c:if test="${message != null && message != ''}">
+                <div class="alert alert-warning" role="alert">
+                    <c:out value="${message}" />
+                </div>
+            </c:if>
+
+            <% if (isProfessional) { %>
+            <div class="access-note access-note-professional">
+                You are signed in as a professional user. You can browse dosing guideline records and open detailed guideline pages.
+            </div>
+            <% } else if (isGeneral) { %>
+            <div class="access-note access-note-general">
+                You are signed in as a general user. You can browse dosing guideline records, but detailed dosing guideline pages are restricted to professional users.
+            </div>
+            <% } else { %>
+            <div class="access-note access-note-visitor">
+                Visitors can browse dosing guideline records. Detailed dosing guideline pages require a professional account.
+            </div>
+            <% } %>
 
             <div class="card search-card mb-4">
                 <div class="card-body">
@@ -249,11 +326,30 @@
                                 </div>
 
                                 <div class="guideline-actions">
+                                    <% if (isProfessional) { %>
                                     <a href="${dosingGuidelineDetailUrl}" class="btn btn-outline-primary btn-sm">
                                         View Detail
                                     </a>
+                                    <% } else if (isLoggedIn) { %>
+                                    <button type="button"
+                                            class="btn btn-professional-only btn-sm"
+                                            disabled>
+                                        View Detail (Professional only)
+                                    </button>
+                                    <% } else { %>
+                                    <a href="<%=request.getContextPath()%>/login?message=Please%20sign%20in%20with%20a%20professional%20account%20to%20view%20detailed%20dosing%20guideline%20information."
+                                       class="btn btn-outline-secondary btn-sm">
+                                        View Detail (Sign in required)
+                                    </a>
+                                    <% } %>
                                 </div>
                             </div>
+
+                            <% if (!isProfessional) { %>
+                            <div class="small-access-hint">
+                                Detailed guideline interpretation is restricted to professional users.
+                            </div>
+                            <% } %>
 
                             <div class="guideline-id-line">
                                 <span class="id-chip">

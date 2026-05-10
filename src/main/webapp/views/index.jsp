@@ -61,7 +61,7 @@
                         Sign in
                     </a>
 
-                    <a class="btn btn-outline-secondary btn-sm ml-2"
+                    <a class="btn btn-outline-primary btn-sm ml-2"
                        href="<%=request.getContextPath()%>/register">
                         Create an account
                     </a>
@@ -128,7 +128,7 @@
                                 User Settings
                             </a>
 
-                            <a class="btn btn-outline-secondary btn-sm mb-2"
+                            <a class="btn btn-outline-primary btn-sm mb-2"
                                href="<%=request.getContextPath()%>/help">
                                 Help / Tutorial
                             </a>
@@ -155,7 +155,7 @@
                                 Mutation-Drug Matching
                             </a>
 
-                            <a class="btn btn-outline-secondary btn-sm mb-2"
+                            <a class="btn btn-outline-primary btn-sm mb-2"
                                href="<%=request.getContextPath()%>/samples">
                                 Sample Records
                             </a>

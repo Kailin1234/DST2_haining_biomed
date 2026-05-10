@@ -1,5 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page isELIgnored="false" %>
+<%@ page import="cn.edu.zju.bean.UserAccount" %>
+
+<%
+    UserAccount loginUser = (UserAccount) session.getAttribute("loginUser");
+    boolean isLoggedIn = loginUser != null;
+%>
 
 <nav class="col-md-2 d-none d-md-block bg-light sidebar">
     <div class="sidebar-sticky">
@@ -46,6 +52,9 @@
                    href="<%=request.getContextPath()%>/matchingIndex">
                     <span data-feather="file"></span>
                     Mutation-Drug Matching
+                    <% if (!isLoggedIn) { %>
+                    <span class="text-muted small">(login required)</span>
+                    <% } %>
                 </a>
             </li>
 
@@ -54,6 +63,9 @@
                    href="<%=request.getContextPath()%>/samples">
                     <span data-feather="file"></span>
                     Sample Records
+                    <% if (!isLoggedIn) { %>
+                    <span class="text-muted small">(login required)</span>
+                    <% } %>
                 </a>
             </li>
         </ul>
@@ -87,6 +99,12 @@
                 </a>
             </li>
         </ul>
+
+        <% if (!isLoggedIn) { %>
+        <div class="px-3 mt-4 small text-muted">
+            Visitors can browse the Knowledge Base. Mutation analysis and sample records require sign-in.
+        </div>
+        <% } %>
 
     </div>
 </nav>
