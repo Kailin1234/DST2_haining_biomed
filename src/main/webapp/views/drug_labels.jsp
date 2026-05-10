@@ -15,90 +15,122 @@
     <link href="<%=request.getContextPath()%>/static/css/app.css" rel="stylesheet">
 
     <style>
+        body {
+            background-color: #f6f8fb;
+        }
+
         .page-subtitle {
             color: #6c757d;
             margin-bottom: 1rem;
         }
 
         .search-card {
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
+            border: 1px solid #e5e9f0;
+            border-radius: 12px;
             background-color: #ffffff;
-        }
-
-        .label-card {
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 18px 20px;
-            margin-bottom: 16px;
-            background-color: #ffffff;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-        }
-
-        .label-header {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 8px;
-        }
-
-        .label-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-right: 12px;
-            margin-bottom: 6px;
-        }
-
-        .label-id-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 999px;
-            background-color: #e9ecef;
-            color: #495057;
-            font-size: 0.9rem;
-            margin-bottom: 6px;
-        }
-
-        .label-meta {
-            color: #495057;
-            font-size: 0.96rem;
-            margin-bottom: 10px;
-        }
-
-        .label-meta strong {
-            color: #343a40;
-        }
-
-        .flag-yes {
-            color: #155724;
-            font-weight: 600;
-        }
-
-        .flag-no {
-            color: #856404;
-            font-weight: 600;
-        }
-
-        .summary-box {
-            color: #343a40;
-            margin-bottom: 12px;
-            line-height: 1.55;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        .label-links {
-            font-size: 0.93rem;
-            color: #6c757d;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px 18px;
-            align-items: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.035);
         }
 
         .result-count {
             font-weight: 600;
             margin-bottom: 16px;
+            color: #343a40;
+        }
+
+        .label-card {
+            border: 1px solid #e5e9f0;
+            border-radius: 12px;
+            padding: 20px 22px;
+            margin-bottom: 16px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.035);
+        }
+
+        .label-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .label-title {
+            font-size: 1.18rem;
+            font-weight: 650;
+            color: #212529;
+            line-height: 1.45;
+            margin-right: 0;
+        }
+
+        .label-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .label-id-line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
+            margin-bottom: 12px;
+        }
+
+        .id-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 11px;
+            border-radius: 999px;
+            background-color: #edf2f7;
+            color: #495057;
+            font-size: 0.86rem;
+            font-weight: 600;
+        }
+
+        .id-chip-label {
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .id-chip-value {
+            color: #212529;
+            font-weight: 700;
+        }
+
+        .label-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
+            align-items: center;
+        }
+
+        .meta-badge {
+            display: inline-block;
+            padding: 6px 11px;
+            border-radius: 999px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            background-color: #f1f3f5;
+            color: #495057;
+        }
+
+        .badge-source {
+            color: #004085;
+            background-color: #d9ecff;
+        }
+
+        .badge-yes {
+            color: #155724;
+            background-color: #d4edda;
+        }
+
+        .badge-no {
+            color: #856404;
+            background-color: #fff3cd;
         }
 
         @media (max-width: 768px) {
@@ -117,6 +149,14 @@
             .form-inline select {
                 width: 100%;
             }
+
+            .label-title-row {
+                display: block;
+            }
+
+            .label-actions {
+                margin-top: 14px;
+            }
         }
     </style>
 </head>
@@ -127,6 +167,7 @@
 
 <div class="container-fluid">
     <div class="row">
+
         <jsp:include page="nav.jsp">
             <jsp:param name="active" value="drug_labels" />
         </jsp:include>
@@ -151,7 +192,7 @@
                                    id="keyword"
                                    name="keyword"
                                    value="${keyword}"
-                                   placeholder="Search by id, name, or summary">
+                                   placeholder="Search by id, name, drug, or source">
                         </div>
 
                         <div class="form-group mr-3 mb-2">
@@ -185,72 +226,72 @@
                         </c:url>
 
                         <div class="label-card">
-                            <div class="label-header">
+
+                            <div class="label-title-row">
                                 <div class="label-title">
-                                    <c:out value="${item.name}" />
+                                    <c:choose>
+                                        <c:when test="${item.name != null && item.name != ''}">
+                                            <c:out value="${item.name}" />
+                                        </c:when>
+                                        <c:otherwise>Drug Label</c:otherwise>
+                                    </c:choose>
                                 </div>
-                                <span class="label-id-badge">
-                                    <c:out value="${item.id}" />
-                                </span>
-                            </div>
 
-                            <div class="label-meta">
-                                <strong>Source:</strong>
-                                <c:choose>
-                                    <c:when test="${item.source != null && item.source != ''}">
-                                        <c:out value="${item.source}" />
-                                    </c:when>
-                                    <c:otherwise>Unknown</c:otherwise>
-                                </c:choose>
-
-                                &nbsp;&nbsp;|&nbsp;&nbsp;
-
-                                <strong>Dosing information:</strong>
-                                <c:choose>
-                                    <c:when test="${item.dosingInformation}">
-                                        <span class="flag-yes">Yes</span>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="flag-no">No</span>
-                                    </c:otherwise>
-                                </c:choose>
-
-                                <c:if test="${item.drugId != null && item.drugId != ''}">
-                                    &nbsp;&nbsp;|&nbsp;&nbsp;
-                                    <strong>Related drug:</strong>
-                                    <c:out value="${item.drugId}" />
-                                </c:if>
-                            </div>
-
-                            <c:if test="${item.summaryMarkdown != null && item.summaryMarkdown != ''}">
-                                <div class="summary-box">
-                                    <c:out value="${item.summaryMarkdown}" />
-                                </div>
-                            </c:if>
-
-                            <div class="label-links">
-                                <span>
+                                <div class="label-actions">
                                     <a href="${drugLabelDetailUrl}" class="btn btn-outline-primary btn-sm">
                                         View Detail
                                     </a>
+                                </div>
+                            </div>
+
+                            <div class="label-id-line">
+                                <span class="id-chip">
+                                    <span class="id-chip-label">Label ID:</span>
+                                    <span class="id-chip-value">
+                                        <c:out value="${item.id}" />
+                                    </span>
                                 </span>
 
-                                <c:if test="${item.treatmentIndication != null && item.treatmentIndication != ''}">
-                                    <span><strong>Treatment indication:</strong> Available</span>
-                                </c:if>
-
-                                <c:if test="${item.targetPopulation != null && item.targetPopulation != ''}">
-                                    <span><strong>Target population:</strong> Available</span>
-                                </c:if>
-
-                                <c:if test="${item.contraindication != null && item.contraindication != ''}">
-                                    <span><strong>Contraindication:</strong> Available</span>
-                                </c:if>
-
-                                <c:if test="${item.warningPrecaution != null && item.warningPrecaution != ''}">
-                                    <span><strong>Warning / precaution:</strong> Available</span>
+                                <c:if test="${item.drugId != null && item.drugId != ''}">
+                                    <span class="id-chip">
+                                        <span class="id-chip-label">Related drug record:</span>
+                                        <span class="id-chip-value">
+                                            <c:out value="${item.drugId}" />
+                                        </span>
+                                    </span>
                                 </c:if>
                             </div>
+
+                            <div class="label-meta">
+                                <span class="meta-badge badge-source">
+                                    Source:
+                                    <c:choose>
+                                        <c:when test="${item.source != null && item.source != ''}">
+                                            <c:out value="${item.source}" />
+                                        </c:when>
+                                        <c:otherwise>Unknown</c:otherwise>
+                                    </c:choose>
+                                </span>
+
+                                <c:choose>
+                                    <c:when test="${item.dosingInformation}">
+                                        <span class="meta-badge badge-yes">Dosing information</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="meta-badge badge-no">No dosing mark</span>
+                                    </c:otherwise>
+                                </c:choose>
+
+                                <c:choose>
+                                    <c:when test="${item.alternateDrugAvailable}">
+                                        <span class="meta-badge badge-yes">Alternative drug available</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="meta-badge badge-no">No alternative mark</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+
                         </div>
                     </c:forEach>
                 </c:when>
@@ -265,5 +306,6 @@
         </main>
     </div>
 </div>
+
 </body>
 </html>

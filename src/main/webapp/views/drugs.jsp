@@ -15,103 +15,105 @@
     <link href="<%=request.getContextPath()%>/static/css/app.css" rel="stylesheet">
 
     <style>
+        body {
+            background-color: #f6f8fb;
+        }
+
         .page-subtitle {
             color: #6c757d;
             margin-bottom: 1rem;
         }
 
         .search-card {
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
+            border: 1px solid #e5e9f0;
+            border-radius: 12px;
             background-color: #ffffff;
-        }
-
-        .drug-card {
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 18px 20px;
-            margin-bottom: 16px;
-            background-color: #ffffff;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-        }
-
-        .drug-header {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 8px;
-        }
-
-        .drug-title {
-            font-size: 1.35rem;
-            font-weight: 600;
-            margin-right: 12px;
-            margin-bottom: 6px;
-        }
-
-        .drug-id-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 999px;
-            background-color: #e9ecef;
-            color: #495057;
-            font-size: 0.9rem;
-            margin-bottom: 6px;
-        }
-
-        .drug-meta {
-            color: #495057;
-            font-size: 0.96rem;
-            margin-bottom: 8px;
-        }
-
-        .drug-meta strong {
-            color: #343a40;
-        }
-
-        .biomarker-yes {
-            color: #155724;
-            font-weight: 600;
-        }
-
-        .biomarker-no {
-            color: #856404;
-            font-weight: 600;
-        }
-
-        .biomarker-unknown {
-            color: #6c757d;
-            font-weight: 600;
-        }
-
-        .drug-description {
-            color: #343a40;
-            margin-bottom: 12px;
-            line-height: 1.55;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        .drug-links {
-            font-size: 0.93rem;
-            color: #6c757d;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px 18px;
-            align-items: center;
-        }
-
-        .drug-links span {
-            display: inline-block;
-        }
-
-        .drug-links strong {
-            color: #495057;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.035);
         }
 
         .result-count {
             font-weight: 600;
             margin-bottom: 16px;
+            color: #343a40;
+        }
+
+        .drug-card {
+            border: 1px solid #e5e9f0;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 14px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.035);
+        }
+
+        .drug-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .drug-title-wrap {
+            min-width: 260px;
+        }
+
+        .drug-title {
+            font-size: 1.25rem;
+            font-weight: 650;
+            margin-right: 10px;
+            color: #212529;
+        }
+
+        .drug-id-badge {
+            display: inline-block;
+            padding: 5px 11px;
+            border-radius: 999px;
+            background-color: #edf2f7;
+            color: #495057;
+            font-size: 0.84rem;
+            font-weight: 600;
+            vertical-align: middle;
+        }
+
+        .drug-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+            align-items: center;
+        }
+
+        .meta-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            background-color: #f1f3f5;
+            color: #495057;
+        }
+
+        .badge-yes {
+            color: #155724;
+            background-color: #d4edda;
+        }
+
+        .badge-no {
+            color: #856404;
+            background-color: #fff3cd;
+        }
+
+        .badge-unknown {
+            color: #6c757d;
+            background-color: #e9ecef;
+        }
+
+        .drug-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
         }
 
         .form-inline .form-group {
@@ -134,6 +136,14 @@
             .form-inline select {
                 width: 100%;
             }
+
+            .drug-card-top {
+                display: block;
+            }
+
+            .drug-actions {
+                margin-top: 14px;
+            }
         }
     </style>
 </head>
@@ -144,6 +154,7 @@
 
 <div class="container-fluid">
     <div class="row">
+
         <jsp:include page="nav.jsp">
             <jsp:param name="active" value="drugs" />
         </jsp:include>
@@ -198,89 +209,58 @@
                         </c:url>
 
                         <div class="drug-card">
-                            <div class="drug-header">
-                                <div class="drug-title">
-                                    <c:out value="${item.name}" />
+                            <div class="drug-card-top">
+
+                                <div class="drug-title-wrap">
+                                    <div>
+                                        <span class="drug-title">
+                                            <c:out value="${item.name}" />
+                                        </span>
+
+                                        <span class="drug-id-badge">
+                                            <c:out value="${item.id}" />
+                                        </span>
+                                    </div>
+
+                                    <div class="drug-meta">
+                                        <span class="meta-badge">
+                                            Category:
+                                            <c:choose>
+                                                <c:when test="${item.objCls != null && item.objCls != ''}">
+                                                    <c:out value="${item.objCls}" />
+                                                </c:when>
+                                                <c:otherwise>Unknown</c:otherwise>
+                                            </c:choose>
+                                        </span>
+
+                                        <c:choose>
+                                            <c:when test="${item.biomarkerAssociated == true}">
+                                                <span class="meta-badge badge-yes">Biomarker-associated</span>
+                                            </c:when>
+                                            <c:when test="${item.biomarkerAssociated == false}">
+                                                <span class="meta-badge badge-no">No biomarker mark</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="meta-badge badge-unknown">Biomarker unknown</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
                                 </div>
-                                <span class="drug-id-badge">
-                                    <c:out value="${item.id}" />
-                                </span>
-                            </div>
 
-                            <div class="drug-meta">
-                                <strong>Category:</strong>
-                                <c:choose>
-                                    <c:when test="${item.objCls != null && item.objCls != ''}">
-                                        <c:out value="${item.objCls}" />
-                                    </c:when>
-                                    <c:otherwise>
-                                        Unknown
-                                    </c:otherwise>
-                                </c:choose>
-
-                                &nbsp;&nbsp;|&nbsp;&nbsp;
-
-                                <strong>Biomarker-associated:</strong>
-                                <c:choose>
-                                    <c:when test="${item.biomarkerAssociated == true}">
-                                        <span class="biomarker-yes">Yes</span>
-                                    </c:when>
-                                    <c:when test="${item.biomarkerAssociated == false}">
-                                        <span class="biomarker-no">No</span>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="biomarker-unknown">Unknown</span>
-                                    </c:otherwise>
-                                </c:choose>
-                            </div>
-
-                            <c:if test="${item.description != null && item.description != ''}">
-                                <div class="drug-description">
-                                    <c:out value="${item.description}" />
-                                </div>
-                            </c:if>
-
-                            <div class="drug-links">
-                                <span>
+                                <div class="drug-actions">
                                     <a href="${drugDetailUrl}" class="btn btn-outline-primary btn-sm">
                                         View Detail
                                     </a>
-                                </span>
 
-                                <c:if test="${item.drugUrl != null && item.drugUrl != ''}">
-                                    <span>
-                                        <strong>Platform:</strong>
-                                        <a href="https://www.pharmgkb.org${item.drugUrl}" target="_blank">Open</a>
-                                    </span>
-                                </c:if>
+                                    <c:if test="${item.drugUrl != null && item.drugUrl != ''}">
+                                        <a href="https://www.pharmgkb.org${item.drugUrl}"
+                                           target="_blank"
+                                           class="btn btn-outline-secondary btn-sm">
+                                            Platform
+                                        </a>
+                                    </c:if>
+                                </div>
 
-                                <c:if test="${item.pharmgkbId != null && item.pharmgkbId != ''}">
-                                    <span>
-                                        <strong>PharmGKB:</strong>
-                                        <c:out value="${item.pharmgkbId}" />
-                                    </span>
-                                </c:if>
-
-                                <c:if test="${item.drugbankId != null && item.drugbankId != ''}">
-                                    <span>
-                                        <strong>DrugBank:</strong>
-                                        <c:out value="${item.drugbankId}" />
-                                    </span>
-                                </c:if>
-
-                                <c:if test="${item.pubchemId != null && item.pubchemId != ''}">
-                                    <span>
-                                        <strong>PubChem:</strong>
-                                        <c:out value="${item.pubchemId}" />
-                                    </span>
-                                </c:if>
-
-                                <c:if test="${item.keggId != null && item.keggId != ''}">
-                                    <span>
-                                        <strong>KEGG:</strong>
-                                        <c:out value="${item.keggId}" />
-                                    </span>
-                                </c:if>
                             </div>
                         </div>
                     </c:forEach>
@@ -296,5 +276,6 @@
         </main>
     </div>
 </div>
+
 </body>
 </html>
