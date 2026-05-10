@@ -3,6 +3,7 @@ package cn.edu.zju.controller;
 import cn.edu.zju.bean.DosingGuideline;
 import cn.edu.zju.bean.Drug;
 import cn.edu.zju.bean.DrugLabel;
+import cn.edu.zju.bean.UserAccount;
 import cn.edu.zju.dao.DosingGuidelineDao;
 import cn.edu.zju.dao.DrugDao;
 import cn.edu.zju.dao.DrugLabelDao;
@@ -14,7 +15,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 public class KnowledgeBaseController {
@@ -27,7 +27,9 @@ public class KnowledgeBaseController {
 
     private boolean requireLogin(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+
         if (request.getSession().getAttribute("loginUser") == null) {
+
             String redirect = buildCurrentPath(request);
             String message = "Please sign in to view detailed dosing guideline information.";
 
@@ -36,12 +38,15 @@ public class KnowledgeBaseController {
                             + "/login?message=" + java.net.URLEncoder.encode(message, "UTF-8")
                             + "&redirect=" + java.net.URLEncoder.encode(redirect, "UTF-8")
             );
+
             return false;
         }
+
         return true;
     }
 
     private String buildCurrentPath(HttpServletRequest request) {
+
         String uri = request.getRequestURI();
         String contextPath = request.getContextPath();
 
@@ -50,6 +55,7 @@ public class KnowledgeBaseController {
         }
 
         String queryString = request.getQueryString();
+
         if (queryString != null && !queryString.isEmpty()) {
             uri = uri + "?" + queryString;
         }
@@ -58,6 +64,7 @@ public class KnowledgeBaseController {
     }
 
     public void register(DispatchServlet.Dispatcher dispatcher) {
+
         dispatcher.registerGetMapping("/drugs", this::drugs);
         dispatcher.registerGetMapping("/drugDetail", this::drugDetail);
         dispatcher.registerGetMapping("/drugLabels", this::drugLabels);
@@ -65,38 +72,29 @@ public class KnowledgeBaseController {
         dispatcher.registerGetMapping("/dosingGuideline", this::dosingGuideline);
         dispatcher.registerGetMapping("/dosingGuidelineDetail", this::dosingGuidelineDetail);
 
-        // Global search entrance
-        dispatcher.registerGetMapping("/search", this::globalSearch);
+        // User settings page.
+        // /settings is the new official route.
+        // /search is kept for backward compatibility with the old Global Search route.
+        dispatcher.registerGetMapping("/settings", this::userSettings);
+        dispatcher.registerGetMapping("/search", this::userSettings);
     }
 
-    public void globalSearch(HttpServletRequest request, HttpServletResponse response)
+    public void userSettings(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String keyword = request.getParameter("keyword");
-        if (keyword != null) {
-            keyword = keyword.trim();
-        }
+        UserAccount loginUser = (UserAccount) request.getSession().getAttribute("loginUser");
 
-        List<Drug> drugResults = Collections.emptyList();
-        List<DrugLabel> labelResults = Collections.emptyList();
-        List<DosingGuideline> guidelineResults = Collections.emptyList();
+        request.setAttribute("settingsUser", loginUser);
 
-        if (keyword != null && !keyword.isEmpty()) {
-            drugResults = drugDao.search(keyword, null);
-            labelResults = drugLabelDao.search(keyword, null);
-            guidelineResults = dosingGuidelineDao.search(keyword, null);
-        }
+        log.info("[User Settings] loginUser={}",
+                loginUser == null ? "guest" : loginUser.getUsername());
 
-        request.setAttribute("keyword", keyword);
-        request.setAttribute("drugCount", drugResults.size());
-        request.setAttribute("labelCount", labelResults.size());
-        request.setAttribute("guidelineCount", guidelineResults.size());
-
-        request.getRequestDispatcher("/views/search.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/settings.jsp").forward(request, response);
     }
 
     public void drugs(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         String keyword = request.getParameter("keyword");
         String biomarker = request.getParameter("biomarker");
 
@@ -137,6 +135,7 @@ public class KnowledgeBaseController {
 
     public void drugLabels(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         String keyword = request.getParameter("keyword");
         String source = request.getParameter("source");
 
@@ -177,6 +176,7 @@ public class KnowledgeBaseController {
 
     public void dosingGuideline(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         String keyword = request.getParameter("keyword");
         String source = request.getParameter("source");
 

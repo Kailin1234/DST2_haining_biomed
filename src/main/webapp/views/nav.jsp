@@ -20,10 +20,10 @@
 
         <ul class="nav flex-column mb-2">
             <li class="nav-item">
-                <a class='nav-link ${param.active == "search" ? "active" : ""}'
-                   href="<%=request.getContextPath()%>/search">
-                    <span data-feather="search"></span>
-                    Global Search
+                <a class='nav-link ${param.active == "settings" ? "active" : ""}'
+                   href="<%=request.getContextPath()%>/settings">
+                    <span data-feather="settings"></span>
+                    User Settings
                 </a>
             </li>
 
